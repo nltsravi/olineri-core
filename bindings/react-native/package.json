@@ -1,0 +1,29 @@
+{
+  "name": "@vaani/react-native-sdk",
+  "version": "0.1.0",
+  "description": "Offline Indian-Language Pronunciation Assessment SDK for React Native",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "react-native",
+    "pronunciation",
+    "speech-assessment",
+    "offline-ai",
+    "tamil",
+    "sanskrit",
+    "hindi",
+    "telugu"
+  ],
+  "author": "Vaani Core Team",
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

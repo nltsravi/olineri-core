@@ -1,0 +1,28 @@
+{
+  "name": "@vaani/capacitor-plugin",
+  "version": "0.1.0",
+  "description": "Offline Indian-Language Pronunciation Assessment Plugin for Capacitor",
+  "main": "dist/plugin.cjs.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "capacitor",
+    "plugin",
+    "native",
+    "speech-assessment",
+    "offline-pronunciation",
+    "indian-languages"
+  ],
+  "author": "Vaani Core Team",
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "@capacitor/core": ">=5.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/core": "^5.0.0",
+    "typescript": "^5.0.0"
+  }
+}

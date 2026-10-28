@@ -1,0 +1,155 @@
+package com.vaani.core
+
+import java.io.Closeable
+
+/**
+ * Phoneme assessment classification.
+ */
+enum class PhonemeStatus(val code: Int) {
+    CORRECT(0),
+    SUBSTITUTION(1),
+    OMISSION(2),
+    INSERTION(3),
+    UNCERTAIN(4);
+
+    companion object {
+        fun fromCode(code: Int): PhonemeStatus =
+            values().firstOrNull { it.code == code } ?: UNCERTAIN
+    }
+}
+
+/**
+ * Phoneme-level diagnostic and articulatory feedback.
+ */
+data class PhonemeFeedback(
+    val expectedPhoneme: String,
+    val statusCode: Int,
+    val score: Float,
+    val charStartUtf8: Int,
+    val charEndUtf8: Int
+) {
+    val status: PhonemeStatus get() = PhonemeStatus.fromCode(statusCode)
+}
+
+/**
+ * Overall pronunciation assessment output.
+ */
+data class VaaniAssessmentResult(
+    val overallScore: Float,
+    val phonemes: List<PhonemeFeedback>
+)
+
+/**
+ * Thread-safe active inference session for a specific language.
+ */
+class VaaniSession internal constructor(
+    private val sessionHandle: Long,
+    val language: String
+) : Closeable {
+
+    private var isClosed = false
+
+    /**
+     * Assesses spoken pronunciation offline.
+     * @param referenceText Expected Brahmic script text (e.g. "பழம்", "नमः", "कमल", "అమ్మ").
+     * @param audioSamples PCM Float audio normalized to [-1.0, 1.0].
+     * @param sampleRate Audio sampling rate (16000 Hz recommended).
+     */
+    fun assess(referenceText: String, audioSamples: FloatArray, sampleRate: Int = 16000): VaaniAssessmentResult {
+        check(!isClosed) { "VaaniSession has been closed." }
+        return nativeAssessPronunciation(sessionHandle, referenceText, audioSamples, sampleRate)
+            ?: throw IllegalStateException("Pronunciation assessment failed in native core.")
+    }
+
+    override fun close() {
+        if (!isClosed) {
+            nativeDestroy(sessionHandle)
+            isClosed = true
+        }
+    }
+
+    private external fun nativeDestroy(handle: Long)
+    private external fun nativeAssessPronunciation(
+        handle: Long,
+        referenceText: String,
+        audioSamples: FloatArray,
+        sampleRate: Int
+    ): VaaniAssessmentResult?
+}
+
+/**
+ * Master offline runtime managing language packages and inference sessions.
+ */
+class VaaniRuntime private constructor(
+    private val runtimeHandle: Long,
+    val storageDir: String
+) : Closeable {
+
+    private var isClosed = false
+
+    /**
+     * Installs a verified language package from local disk storage.
+     * @param packageDirectoryPath Unpacked package directory or archive location.
+     * @return Package ID string (e.g. "lang-ta", "lang-sa").
+     */
+    fun installPackage(packageDirectoryPath: String): String {
+        check(!isClosed) { "VaaniRuntime has been closed." }
+        return nativeInstallPackage(runtimeHandle, packageDirectoryPath)
+            ?: throw IllegalArgumentException("Failed to install package from: $packageDirectoryPath")
+    }
+
+    /**
+     * Removes an installed language package and frees storage.
+     */
+    fun uninstallPackage(packageId: String): Boolean {
+        check(!isClosed) { "VaaniRuntime has been closed." }
+        return nativeUninstallPackage(runtimeHandle, packageId)
+    }
+
+    /**
+     * Creates an assessment session for an installed language.
+     * @param languageTag BCP-47 language tag (e.g. "ta-IN", "sa-IN", "hi-IN", "te-IN").
+     */
+    fun createSession(languageTag: String): VaaniSession {
+        check(!isClosed) { "VaaniRuntime has been closed." }
+        val sessionHandle = nativeCreateSession(runtimeHandle, languageTag)
+        if (sessionHandle == 0L) {
+            throw IllegalArgumentException("Cannot create session for language '$languageTag'. Package may not be installed.")
+        }
+        return VaaniSession(sessionHandle, languageTag)
+    }
+
+    override fun close() {
+        if (!isClosed) {
+            nativeDestroy(runtimeHandle)
+            isClosed = true
+        }
+    }
+
+    private external fun nativeDestroy(handle: Long)
+    private external fun nativeInstallPackage(handle: Long, packagePath: String): String?
+    private external fun nativeUninstallPackage(handle: Long, packageId: String): Boolean
+    private external fun nativeCreateSession(handle: Long, languageTag: String): Long
+
+    companion object {
+        init {
+            System.loadLibrary("vaani_core")
+            System.loadLibrary("vaani_jni")
+        }
+
+        /**
+         * Initializes the offline Vaani SDK runtime.
+         */
+        @JvmStatic
+        fun initialize(storageDirectory: String): VaaniRuntime {
+            val handle = nativeCreate(storageDirectory)
+            if (handle == 0L) {
+                throw IllegalStateException("Failed to initialize Vaani native runtime at: $storageDirectory")
+            }
+            return VaaniRuntime(handle, storageDirectory)
+        }
+
+        @JvmStatic
+        private external fun nativeCreate(storageDir: String): Long
+    }
+}

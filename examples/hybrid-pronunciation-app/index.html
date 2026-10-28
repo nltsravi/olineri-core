@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vaani Pronunciation SDK — Offline Hybrid Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="logo-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" x2="12" y1="19" y2="22"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="app-title">Vaani Core SDK</h1>
+          <p class="app-subtitle">Offline Indian-Language Pronunciation Assessment</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="offline-badge" id="offline-indicator">
+          <span class="status-dot"></span>
+          <span id="offline-text">100% Offline Mode</span>
+        </div>
+        <button class="btn-toggle-offline" id="toggle-offline-btn" title="Simulate Airplane Mode">
+          ✈️ Airplane Mode
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="main-grid">
+      <!-- Left Column: Language Packages & Settings -->
+      <section class="panel language-panel">
+        <div class="panel-header">
+          <h2>Language Packages</h2>
+          <span class="badge" id="installed-count-badge">1 Installed</span>
+        </div>
+        <p class="panel-desc">Independently installable, verified offline acoustic packages.</p>
+
+        <div class="package-list" id="package-list">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="security-card">
+          <div class="security-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>Package Integrity & Security</span>
+          </div>
+          <p class="security-text">
+            All models are signed via Ed25519 & verified with SHA-256 before extraction. Atomic installation prevents corrupted updates.
+          </p>
+        </div>
+      </section>
+
+      <!-- Center/Right Column: Pronunciation Studio -->
+      <section class="panel studio-panel">
+        <div class="panel-header">
+          <h2>Pronunciation Assessment Studio</h2>
+          <div class="active-lang-badge" id="active-lang-label">Active: Tamil (ta-IN)</div>
+        </div>
+
+        <!-- Target Word Selection -->
+        <div class="target-card">
+          <div class="target-card-header">
+            <span class="label">Target Reference Phrase</span>
+            <div class="target-chips" id="target-chips">
+              <!-- Preset chips populated by JS -->
+            </div>
+          </div>
+
+          <div class="text-input-group">
+            <input type="text" id="reference-text-input" class="target-input" value="பழம்" spellcheck="false">
+            <span class="input-hint" id="meaning-hint">Meaning: fruit • Key phoneme: ழ (/ɻ/ retroflex approximant)</span>
+          </div>
+        </div>
+
+        <!-- Audio Input & Assessment Control -->
+        <div class="audio-control-card">
+          <div class="audio-actions">
+            <button class="btn-mic" id="record-btn">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" x2="12" y1="19" y2="22"/>
+              </svg>
+              <span id="record-btn-text">Record Voice</span>
+            </button>
+
+            <button class="btn-secondary" id="sim-correct-btn">
+              ✨ Test Correct Native Spoken
+            </button>
+
+            <button class="btn-secondary btn-error-sim" id="sim-error-btn">
+              ⚠️ Test Learner Error (ழ $\to$ ல)
+            </button>
+          </div>
+
+          <div class="waveform-container">
+            <canvas id="waveform-canvas" width="600" height="60"></canvas>
+            <div class="audio-meta">
+              <span id="audio-status">Engine Ready (16 kHz Float32 PCM)</span>
+              <span id="audio-duration">0.00s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assessment Results Display -->
+        <div class="results-card" id="results-container">
+          <div class="results-header">
+            <h3>Acoustic Assessment Diagnostic</h3>
+            <div class="latency-meta" id="latency-meta">Cold: 0.02ms • Inference: 0.42ms</div>
+          </div>
+
+          <div class="score-summary-grid">
+            <div class="radial-score-box">
+              <div class="radial-score" id="overall-score-display">--</div>
+              <div class="score-label">Overall Calibrated Score</div>
+            </div>
+
+            <div class="akshara-highlight-box">
+              <div class="akshara-label">Character-to-Phoneme Alignment</div>
+              <div class="akshara-display" id="akshara-display">
+                <!-- Interactive character spans -->
+              </div>
+              <div class="akshara-subtext">Click on any akshara character to inspect its articulatory feedback.</div>
+            </div>
+          </div>
+
+          <!-- Phoneme Breakdown Table -->
+          <div class="phoneme-table-wrapper">
+            <table class="phoneme-table">
+              <thead>
+                <tr>
+                  <th>Target Sound</th>
+                  <th>Grapheme</th>
+                  <th>Detected Sound</th>
+                  <th>Classification</th>
+                  <th>Score</th>
+                  <th>Articulatory Corrective Instruction</th>
+                </tr>
+              </thead>
+              <tbody id="phoneme-table-body">
+                <tr>
+                  <td colspan="6" class="placeholder-row">Record speech or click a simulation test to run offline assessment.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Diagnostics -->
+    <footer class="app-footer">
+      <div class="footer-stat">
+        <span class="stat-name">Core Engine:</span>
+        <span class="stat-value">C++17 Stable ABI (v0.1.0)</span>
+      </div>
+      <div class="footer-stat">
+        <span class="stat-name">Acoustic Scoring:</span>
+        <span class="stat-value">Constrained CTC Viterbi + GOP</span>
+      </div>
+      <div class="footer-stat">
+        <span class="stat-name">Zero-Telemetry:</span>
+        <span class="stat-value text-success">Verified (0 Cloud Calls)</span>
+      </div>
+      <div class="footer-stat">
+        <span class="stat-name">Resident Memory:</span>
+        <span class="stat-value" id="res-mem-stat">~14.2 MB</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
