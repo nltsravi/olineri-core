@@ -1,0 +1,66 @@
+name: Vaani Core CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Build Dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential clang
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+
+      - name: Build Core Libraries & Tests
+        run: |
+          cmake --build build --config Release -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+
+      - name: Run Automated CTest Suite
+        run: |
+          ctest --test-dir build --output-on-failure --verbose
+
+      - name: Run Benchmark Harness
+        run: |
+          ./build/benchmark_engine
+
+  address-sanitizer:
+    name: Native Memory Safety (AddressSanitizer)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure CMake with ASan
+        run: |
+          cmake -B build_asan \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
+            -DBUILD_TESTS=ON
+
+      - name: Build with ASan
+        run: |
+          cmake --build build_asan -j$(nproc)
+
+      - name: Run Tests with ASan Verification
+        env:
+          ASAN_OPTIONS: "detect_leaks=1:abort_on_error=1"
+        run: |
+          ctest --test-dir build_asan --output-on-failure

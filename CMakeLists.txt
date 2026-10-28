@@ -56,4 +56,8 @@ if(BUILD_TESTS)
     vaani_add_test(test_runtime core/tests/test_runtime.cpp)
     vaani_add_test(test_tamil_assessment core/tests/test_tamil_assessment.cpp)
     vaani_add_test(test_multi_language core/tests/test_multi_language.cpp)
+
+    # Benchmarks
+    add_executable(benchmark_engine benchmarks/benchmark_engine.cpp)
+    target_link_libraries(benchmark_engine PRIVATE vaani_core_static)
 endif()

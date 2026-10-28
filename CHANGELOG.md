@@ -34,3 +34,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **Added:** Unicode Brahmic G2P engine (`core/src/g2p.cpp`) segmenting Tamil Aksharas and calculating exact byte spans for UI highlight.
 * **Added:** End-to-end integration test (`core/tests/test_tamil_assessment.cpp`) validating G2P transformation, Akshara coordinate spans, correct pronunciation scoring, and substitution detection on ழ.
 * **Added:** Tamil pilot empirical measurement report (`docs/tamil-pilot.md`).
+
+### Milestone 4: Language Expansion (Sanskrit `lang-sa`, Hindi `lang-hi`, Telugu `lang-te`)
+* **Added:** Sanskrit phonological model in G2P with strict inherent vowel retention and Visarga (ः) vowel echo-aspiration.
+* **Added:** Hindi phonological model in G2P with 2-tier contextual schwa deletion (final schwa and internal $VC_1 ə C_2 V$) and Perso-Arabic Nukta loanwords (क़, ख़, ग़, ज़, फ़, ड़, ढ़).
+* **Added:** Telugu phonological model in G2P with short/long vowel pairs (e/ē, o/ō), consonant gemination closure duration (vottulu), and Sunna (ం).
+* **Added:** Language resources for `sa`, `hi`, and `te`: phoneme inventories, articulatory advice strings, and minimal-pair test cases.
+* **Added:** Comprehensive automated multilingual test suite (`core/tests/test_multi_language.cpp`).
+* **Added:** Language expansion verification documentation (`docs/language-expansion.md`).
+
+### Milestone 5: Hybrid & Native Mobile SDK Bindings
+* **Added:** Android Kotlin SDK and JNI native module bridge (`bindings/android/`).
+* **Added:** iOS Swift framework and Swift Package Manager configuration (`bindings/ios/`).
+* **Added:** React Native TypeScript package with native Android/iOS bridge modules (`bindings/react-native/`).
+* **Added:** Flutter plugin backed by Dart FFI bindings (`bindings/flutter/`).
+* **Added:** Capacitor/Ionic plugin implementation with web fallback (`bindings/capacitor/`).
+* **Added:** Interactive hybrid mobile demonstration application (`examples/hybrid-pronunciation-app/`).
+* **Added:** Step-by-step mobile integration guides (`docs/integration-guides.md`).
+
+### Milestone 6: Production Readiness & Release
+* **Added:** Reproducible performance benchmarking harness (`benchmarks/benchmark_engine.cpp`).
+* **Added:** Multi-platform GitHub Actions CI workflow with AddressSanitizer checks (`.github/workflows/ci.yml`).
+* **Added:** Complete C ABI and mobile bindings reference manual (`docs/api-reference.md`).
+* **Added:** Comprehensive feature support matrix (`docs/feature-matrix.md`).
+* **Added:** Known limitations, dialect variations, and technical constraints document (`docs/known-limitations.md`).
+* **Added:** Formal release-readiness verification report (`docs/release-readiness-report.md`).
