@@ -1,0 +1,26 @@
+{
+  "language": "te-IN",
+  "cases": [
+    {
+      "id": "te_word_amma",
+      "text": "అమ్మ",
+      "meaning": "mother",
+      "expectedPhonemes": ["/ɐ/", "/m/", "/m/", "/ɐ/"],
+      "phonologicalNote": "Geminate bilabial nasal closure"
+    },
+    {
+      "id": "te_vowel_pair_e_ee",
+      "text": "ఎండ",
+      "meaning": "sunshine",
+      "expectedPhonemes": ["/e/", "/m/", "/ɖ/", "/ɐ/"],
+      "phonologicalNote": "Short vowel /e/ vs long /eː/"
+    },
+    {
+      "id": "te_word_telugu",
+      "text": "తెలుగు",
+      "meaning": "Telugu language",
+      "expectedPhonemes": ["/t̪/", "/e/", "/l/", "/u/", "/ɡ/", "/u/"],
+      "phonologicalNote": "Vowel ending: naturally terminates in vowel /u/"
+    }
+  ]
+}

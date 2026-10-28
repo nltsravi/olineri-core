@@ -1,0 +1,10 @@
+{
+  "language": "en",
+  "instructions": {
+    "correct": "Accurate Vedic/Classical Sanskrit articulation.",
+    "visarga_echo": "For Visarga (ः), release an audible echo of the preceding vowel (e.g. 'a-ha' after 'a', 'i-hi' after 'i').",
+    "aspiration_loss": "Aspiration missing. Release a strong burst of breath from the vocal tract.",
+    "vowel_shortened": "Long vowel was shortened. Maintain vowel duration for two morae (matras).",
+    "schwa_deleted": "Do not delete the final inherent vowel. Classical Sanskrit pronounces every final vowel fully."
+  }
+}

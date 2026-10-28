@@ -1,0 +1,26 @@
+{
+  "language": "sa-IN",
+  "cases": [
+    {
+      "id": "sa_word_namah",
+      "text": "नमः",
+      "meaning": "salutations/reverence",
+      "expectedPhonemes": ["/n̪/", "/ɐ/", "/m/", "/ɐ/", "/h/", "/ɐ/"],
+      "phonologicalNote": "Visarga echoes preceding vowel 'a' -> /hɐ/"
+    },
+    {
+      "id": "sa_word_ramah",
+      "text": "रामः",
+      "meaning": "Lord Rama",
+      "expectedPhonemes": ["/r/", "/aː/", "/m/", "/ɐ/", "/h/", "/ɐ/"],
+      "phonologicalNote": "Final vowel retained, visarga echoed"
+    },
+    {
+      "id": "sa_word_shanti",
+      "text": "शान्तिः",
+      "meaning": "peace",
+      "expectedPhonemes": ["/ɕ/", "/aː/", "/n̪/", "/t̪/", "/i/", "/h/", "/i/"],
+      "phonologicalNote": "Visarga echoes preceding vowel 'i' -> /hi/"
+    }
+  ]
+}

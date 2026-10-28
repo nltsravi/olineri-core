@@ -1,0 +1,9 @@
+{
+  "language": "en",
+  "instructions": {
+    "correct": "Accurate Telugu pronunciation.",
+    "vowel_length_mismatch": "Distinguish between short and long vowel pairs (e/ē or o/ō).",
+    "gemination_timing": "Consonant gemination (vottulu): prolong the consonant closure duration.",
+    "retroflex_vs_dental": "Adjust tongue placement: curl tongue back for retroflex (ట, డ, ళ)."
+  }
+}

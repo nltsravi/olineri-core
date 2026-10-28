@@ -1,0 +1,26 @@
+{
+  "language": "hi-IN",
+  "cases": [
+    {
+      "id": "hi_word_kamal",
+      "text": "कमल",
+      "meaning": "lotus",
+      "expectedPhonemes": ["/k/", "/ə/", "/m/", "/ə/", "/l/"],
+      "phonologicalRule": "Final schwa deletion: /kəməl/ (no vowel after /l/)"
+    },
+    {
+      "id": "hi_word_fal",
+      "text": "फल",
+      "meaning": "fruit",
+      "expectedPhonemes": ["/pʰ/", "/ə/", "/l/"],
+      "phonologicalRule": "Initial aspirate /pʰ/, final schwa deleted"
+    },
+    {
+      "id": "hi_word_chalna",
+      "text": "चलना",
+      "meaning": "to walk",
+      "expectedPhonemes": ["/t͡ʃ/", "/ə/", "/l/", "/n/", "/aː/"],
+      "phonologicalRule": "Internal schwa deletion in VCəCV environment: /t͡ʃəlnaː/"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "language": "en",
+  "instructions": {
+    "correct": "Accurate Standard Hindi pronunciation.",
+    "schwa_retention_error": "Do not pronounce an explicit vowel at the end of the word. Standard Hindi drops the final schwa.",
+    "aspiration_missing": "This consonant requires an audible burst of breath (aspiration).",
+    "dental_vs_retroflex": "Adjust tongue contact point: dental sounds touch upper teeth; retroflex sounds touch the palate.",
+    "nukta_missing": "This loan sound requires frication: pronounce /z/ not /d͡ʒ/, or /f/ not /pʰ/."
+  }
+}
