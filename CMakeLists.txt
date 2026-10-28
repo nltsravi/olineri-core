@@ -23,6 +23,7 @@ set(VAANI_CORE_SOURCES
     core/src/manifest.cpp
     core/src/package_manager.cpp
     core/src/scoring_engine.cpp
+    core/src/g2p.cpp
     core/src/runtime.cpp
     backends/mock/mock_engine.cpp
 )
@@ -53,4 +54,5 @@ if(BUILD_TESTS)
     vaani_add_test(test_package_manager core/tests/test_package_manager.cpp)
     vaani_add_test(test_scoring core/tests/test_scoring.cpp)
     vaani_add_test(test_runtime core/tests/test_runtime.cpp)
+    vaani_add_test(test_tamil_assessment core/tests/test_tamil_assessment.cpp)
 endif()

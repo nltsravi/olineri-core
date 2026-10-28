@@ -1,0 +1,46 @@
+{
+  "language": "ta-IN",
+  "cases": [
+    {
+      "id": "ta_minimal_pair_pazham",
+      "text": "பழம்",
+      "meaning": "fruit",
+      "expectedPhonemes": ["/p/", "/ɐ/", "/ɻ/", "/ɐ/", "/m/"],
+      "criticalPhoneme": "/ɻ/",
+      "criticalGrapheme": "ழ",
+      "commonSubstitutions": ["/l/", "/ɭ/"]
+    },
+    {
+      "id": "ta_minimal_pair_palam",
+      "text": "பலம்",
+      "meaning": "strength",
+      "expectedPhonemes": ["/p/", "/ɐ/", "/l/", "/ɐ/", "/m/"],
+      "criticalPhoneme": "/l/",
+      "criticalGrapheme": "ல"
+    },
+    {
+      "id": "ta_word_thamizh",
+      "text": "தமிழ்",
+      "meaning": "Tamil language",
+      "expectedPhonemes": ["/t̪/", "/ɐ/", "/m/", "/i/", "/ɻ/"],
+      "criticalPhoneme": "/ɻ/",
+      "criticalGrapheme": "ழ்"
+    },
+    {
+      "id": "ta_minimal_pair_aram_virtue",
+      "text": "அறம்",
+      "meaning": "virtue/morality",
+      "expectedPhonemes": ["/ɐ/", "/r/", "/ɐ/", "/m/"],
+      "criticalPhoneme": "/r/",
+      "criticalGrapheme": "ற"
+    },
+    {
+      "id": "ta_minimal_pair_aram_saw",
+      "text": "அரம்",
+      "meaning": "file/metal saw",
+      "expectedPhonemes": ["/ɐ/", "/ɾ/", "/ɐ/", "/m/"],
+      "criticalPhoneme": "/ɾ/",
+      "criticalGrapheme": "ர"
+    }
+  ]
+}

@@ -27,3 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **Added:** Pluggable `InferenceEngine` interface and deterministic `MockEngine` (`backends/mock/mock_engine.cpp`).
 * **Added:** Root `CMakeLists.txt` compiling static and shared libraries with C++17.
 * **Added:** 5 comprehensive automated test suites (`test_crypto`, `test_manifest`, `test_package_manager`, `test_scoring`, `test_runtime`) with 100% test pass rate.
+
+### Milestone 3: First Real Language End-to-End (Tamil `lang-ta`)
+* **Added:** Tamil phoneme inventory (`language-resources/ta/phoneme_inventory.json`) covering 31 canonical sounds.
+* **Added:** English and Tamil localized articulatory feedback strings (`language-resources/ta/feedback/strings_en.json`, `strings_ta.json`) with specialized corrective advice for the liquid triplet (ழ /ɻ/, ள /ɭ/, ல /l/) and rhotics (ற /r/, ர /ɾ/).
+* **Added:** Unicode Brahmic G2P engine (`core/src/g2p.cpp`) segmenting Tamil Aksharas and calculating exact byte spans for UI highlight.
+* **Added:** End-to-end integration test (`core/tests/test_tamil_assessment.cpp`) validating G2P transformation, Akshara coordinate spans, correct pronunciation scoring, and substitution detection on ழ.
+* **Added:** Tamil pilot empirical measurement report (`docs/tamil-pilot.md`).

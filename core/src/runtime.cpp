@@ -3,6 +3,7 @@
 #include "vaani/internal/scoring_engine.hpp"
 #include "vaani/internal/inference_engine.hpp"
 #include "vaani/internal/filesystem.hpp"
+#include "vaani/internal/g2p.hpp"
 #include "backends/mock/mock_engine.hpp"
 
 #include <string>
@@ -30,6 +31,7 @@ struct vaani_session_s {
     vaani::manifest::PackageManifest manifest;
     std::unique_ptr<vaani::inference::InferenceEngine> engine;
     std::unique_ptr<vaani::scoring::ScoringEngine> scorer;
+    std::unique_ptr<vaani::g2p::BrahmicG2P> g2p;
 };
 
 struct vaani_result_s {
@@ -247,6 +249,7 @@ VAANI_API vaani_status_t vaani_session_create(
 
         session->engine = std::move(mock);
         session->scorer = std::make_unique<vaani::scoring::ScoringEngine>();
+        session->g2p = std::make_unique<vaani::g2p::BrahmicG2P>(vaani::g2p::G2PConfig{language_tag, true, true});
 
         {
             std::lock_guard<std::mutex> lock(runtime->sessions_mutex);
@@ -293,35 +296,10 @@ VAANI_API vaani_status_t vaani_assess_pronunciation(
         return VAANI_ERR_AUDIO_INVALID;
     }
 
-    // 1. Synthesize target phonemes from reference text
-    // (In M2, target tokens are created from UTF-8 clusters; full Brahmic G2P is loaded in M3)
-    std::vector<vaani::scoring::PhonemeTarget> targets;
-    std::string ref_str(reference_text);
-    size_t byte_idx = 0;
-    uint32_t cluster_idx = 0;
-
-    // Simple UTF-8 boundary segmentation for baseline target generation
-    while (byte_idx < ref_str.size()) {
-        unsigned char c = static_cast<unsigned char>(ref_str[byte_idx]);
-        size_t len = 1;
-        if ((c & 0x80) == 0) len = 1;
-        else if ((c & 0xE0) == 0xC0) len = 2;
-        else if ((c & 0xF0) == 0xE0) len = 3;
-        else if ((c & 0xF8) == 0xF0) len = 4;
-
-        if (byte_idx + len > ref_str.size()) len = ref_str.size() - byte_idx;
-
-        vaani::scoring::PhonemeTarget pt;
-        pt.ipa = ref_str.substr(byte_idx, len);
-        pt.token_id = (cluster_idx % 60) + 1; // Map to token 1..60 (token 0 is blank)
-        pt.char_start_utf8 = static_cast<uint32_t>(byte_idx);
-        pt.char_end_utf8 = static_cast<uint32_t>(byte_idx + len);
-        pt.cluster_index = cluster_idx;
-        pt.cluster_count = 1;
-        targets.push_back(pt);
-
-        byte_idx += len;
-        cluster_idx++;
+    // 1. Convert reference text using Unicode-aware Brahmic G2P engine
+    std::vector<vaani::scoring::PhonemeTarget> targets = session->g2p->convert(reference_text);
+    if (targets.empty()) {
+        return VAANI_ERR_INVALID_ARGUMENT;
     }
 
     // For MockEngine: configure the expected token sequence

@@ -1,0 +1,14 @@
+{
+  "language": "en",
+  "instructions": {
+    "correct": "Excellent pronunciation! Articulation accurately matches native acoustic targets.",
+    "omission": "Sound was omitted or inaudible. Ensure this syllable is clearly enunciated.",
+    "uncertain": "Articulation was unclear or masked by background noise. Please retry in a quiet space.",
+    "substitution_default": "Substituted sound detected. Adjust your tongue position and retry.",
+    "/ɻ/_sub_/l/": "You pronounced an alveolar 'l' (ல) instead of retroflex 'zh' (ழ). Curl the tip of your tongue backward towards the hard palate, but DO NOT touch the roof of your mouth. Air must flow smoothly.",
+    "/ɻ/_sub_/ɭ/": "You touched the hard palate, producing retroflex 'L' (ள) instead of 'zh' (ழ). For ழ, keep the tongue curled back without letting it contact the palate.",
+    "/r/_sub_/ɾ/": "You produced a soft flap 'r' (ர) instead of the strong trill 'R' (ற). Vibrate the tongue tip more firmly against the alveolar ridge.",
+    "/ɭ/_sub_/l/": "You pronounced an alveolar 'l' (ல) instead of retroflex 'L' (ள). Curl the tongue backward so the underside contacts the hard palate, then flap downward.",
+    "/ʈ/_sub_/t̪/": "You pronounced a dental 'th' (த) instead of retroflex 'T' (ட). Curl your tongue back to hit the palate, not behind the front teeth."
+  }
+}
