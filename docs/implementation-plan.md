@@ -1,6 +1,6 @@
 # Engineering Implementation Plan & Milestone Roadmap
 
-This roadmap governs the phased, milestone-by-milestone development of the `vaani-core` offline pronunciation assessment SDK.
+This roadmap governs the phased, milestone-by-milestone development of the `olineri-core` offline pronunciation assessment SDK.
 
 ---
 
@@ -33,7 +33,7 @@ This roadmap governs the phased, milestone-by-milestone development of the `vaan
 ## Milestone 2: Core Runtime and Manifest Engine
 
 ### Objectives
-* Implement the core C++17 runtime and extern "C" stable ABI (`include/vaani/vaani_c_api.h`).
+* Implement the core C++17 runtime and extern "C" stable ABI (`include/olineri/olineri_c_api.h`).
 * Implement package manifest parser and validator (`manifest-schema/`).
 * Implement cryptographic verification (SHA-256 integrity and Ed25519 signature checks).
 * Implement the atomic package installer, updater, and rollback manager.
@@ -41,7 +41,7 @@ This roadmap governs the phased, milestone-by-milestone development of the `vaan
 * Create automated unit tests for runtime lifecycle, package validation, and error recovery.
 
 ### Key Technical Deliverables
-* `core/include/vaani/vaani_c_api.h`: Stable C header.
+* `core/include/olineri/olineri_c_api.h`: Stable C header.
 * `core/src/runtime.cpp`: Runtime lifecycle, session management, resource limits.
 * `core/src/package_manager.cpp`: Secure archive unpacking, checksum validation, atomic staging swap.
 * `core/src/manifest.cpp`: Schema validation, version compatibility enforcement.

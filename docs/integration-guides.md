@@ -1,6 +1,6 @@
 # Hybrid & Native Mobile Integration Guides
 
-This guide covers integrating the offline **Vaani Pronunciation SDK** (`vaani-core`) into:
+This guide covers integrating the offline **Olineri Pronunciation SDK** (`olineri-core`) into:
 1. [Android (Kotlin / JNI)](#1-android-integration-kotlin--jni)
 2. [iOS (Swift / Swift Package Manager)](#2-ios-integration-swift--spm)
 3. [React Native (TypeScript)](#3-react-native-integration)
@@ -16,18 +16,18 @@ In your app module's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.vaani.core:vaani-android:0.1.0")
+    implementation("com.olineri.core:olineri-android:0.1.0")
 }
 ```
 
 ### 1.2 SDK Usage
 
 ```kotlin
-import com.vaani.core.VaaniRuntime
-import com.vaani.core.PhonemeStatus
+import com.olineri.core.OlineriRuntime
+import com.olineri.core.PhonemeStatus
 
 // 1. Initialize Runtime with app-private storage
-val runtime = VaaniRuntime.initialize(context.filesDir.absolutePath)
+val runtime = OlineriRuntime.initialize(context.filesDir.absolutePath)
 
 // 2. Install verified language package (e.g. Tamil)
 val packageId = runtime.installPackage("/sdcard/Download/lang-ta")
@@ -62,17 +62,17 @@ runtime.close()
 
 ### 2.1 Package Setup
 In Xcode, select **File > Add Packages...** and add the repository URL or local package reference:
-`path/to/vaani-core/bindings/ios`
+`path/to/olineri-core/bindings/ios`
 
 ### 2.2 SDK Usage
 
 ```swift
-import VaaniSDK
+import OlineriSDK
 
 do {
     // 1. Initialize Runtime
     let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    let runtime = try VaaniRuntime(storageDirectory: docsUrl.path)
+    let runtime = try OlineriRuntime(storageDirectory: docsUrl.path)
 
     // 2. Install package
     let pkgPath = Bundle.main.path(forResource: "lang-ta", ofType: nil)!
@@ -105,13 +105,13 @@ do {
 ### 3.1 Installation
 
 ```bash
-npm install @vaani/react-native-sdk
+npm install @olineri/react-native-sdk
 ```
 
 ### 3.2 Usage
 
 ```typescript
-import PronunciationSDK from "@vaani/react-native-sdk";
+import PronunciationSDK from "@olineri/react-native-sdk";
 
 // 1. Initialize SDK
 const sdk = await PronunciationSDK.initialize({
@@ -166,20 +166,20 @@ In `pubspec.yaml`:
 dependencies:
   flutter:
     sdk: flutter
-  vaani_flutter:
-    path: path/to/vaani-core/bindings/flutter
+  olineri_flutter:
+    path: path/to/olineri-core/bindings/flutter
 ```
 
 ### 4.2 SDK Usage
 
 ```dart
 import 'dart:typed_data';
-import 'package:vaani_flutter/vaani_flutter.dart';
+import 'package:olineri_flutter/olineri_flutter.dart';
 
 Future<void> runAssessment() async {
   // 1. Initialize Runtime
-  final runtime = await VaaniRuntime.initialize(
-    storageDirectory: "/data/user/0/com.example/app_flutter/vaani_models",
+  final runtime = await OlineriRuntime.initialize(
+    storageDirectory: "/data/user/0/com.example/app_flutter/olineri_models",
   );
 
   // 2. Install Package
@@ -214,23 +214,23 @@ Future<void> runAssessment() async {
 ### 5.1 Installation
 
 ```bash
-npm install @vaani/capacitor-plugin
+npm install @olineri/capacitor-plugin
 npx cap sync
 ```
 
 ### 5.2 Usage
 
 ```typescript
-import { Vaani } from '@vaani/capacitor-plugin';
+import { Olineri } from '@olineri/capacitor-plugin';
 
 // 1. Initialize Runtime
-await Vaani.initializeRuntime({});
+await Olineri.initializeRuntime({});
 
 // 2. Install Package
-await Vaani.installPackage({ packagePath: '/path/to/lang-ta' });
+await Olineri.installPackage({ packagePath: '/path/to/lang-ta' });
 
 // 3. Assess Pronunciation
-const result = await Vaani.assessPronunciation({
+const result = await Olineri.assessPronunciation({
   language: 'ta-IN',
   referenceText: 'பழம்',
   samples: recordedPcmFloats,

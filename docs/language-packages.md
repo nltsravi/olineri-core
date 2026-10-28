@@ -16,7 +16,7 @@ This document defines the physical structure, metadata manifest schema, cryptogr
 
 ## 2. Directory Layout of an Installed Package
 
-Within the host application's private app data storage directory (e.g. `/data/user/0/com.app/files/vaani/packages/lang-ta/`):
+Within the host application's private app data storage directory (e.g. `/data/user/0/com.app/files/olineri/packages/lang-ta/`):
 
 ```text
 lang-ta/
@@ -44,7 +44,7 @@ A JSON schema for `manifest.json`:
 
 ```json
 {
-  "$schema": "https://vaani.dev/schemas/package-manifest-v1.json",
+  "$schema": "https://olineri.dev/schemas/package-manifest-v1.json",
   "schemaVersion": "1.0.0",
   "packageId": "lang-ta",
   "language": "ta-IN",
@@ -53,9 +53,9 @@ A JSON schema for `manifest.json`:
   "minSdkVersion": "0.1.0",
   "displayName": "Tamil (தமிழ்)",
   "publisher": {
-    "name": "Vaani Core Team",
-    "url": "https://github.com/nltsravi/vaani-core",
-    "publicKeyId": "vaani-release-2026-01"
+    "name": "Olineri Core Team",
+    "url": "https://github.com/nltsravi/olineri-core",
+    "publicKeyId": "olineri-release-2026-01"
   },
   "capabilities": [
     "speechRecognition",

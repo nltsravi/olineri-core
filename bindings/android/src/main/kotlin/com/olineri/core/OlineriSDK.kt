@@ -1,4 +1,4 @@
-package com.vaani.core
+package com.olineri.core
 
 import java.io.Closeable
 
@@ -34,7 +34,7 @@ data class PhonemeFeedback(
 /**
  * Overall pronunciation assessment output.
  */
-data class VaaniAssessmentResult(
+data class OlineriAssessmentResult(
     val overallScore: Float,
     val phonemes: List<PhonemeFeedback>
 )
@@ -42,7 +42,7 @@ data class VaaniAssessmentResult(
 /**
  * Thread-safe active inference session for a specific language.
  */
-class VaaniSession internal constructor(
+class OlineriSession internal constructor(
     private val sessionHandle: Long,
     val language: String
 ) : Closeable {
@@ -55,8 +55,8 @@ class VaaniSession internal constructor(
      * @param audioSamples PCM Float audio normalized to [-1.0, 1.0].
      * @param sampleRate Audio sampling rate (16000 Hz recommended).
      */
-    fun assess(referenceText: String, audioSamples: FloatArray, sampleRate: Int = 16000): VaaniAssessmentResult {
-        check(!isClosed) { "VaaniSession has been closed." }
+    fun assess(referenceText: String, audioSamples: FloatArray, sampleRate: Int = 16000): OlineriAssessmentResult {
+        check(!isClosed) { "OlineriSession has been closed." }
         return nativeAssessPronunciation(sessionHandle, referenceText, audioSamples, sampleRate)
             ?: throw IllegalStateException("Pronunciation assessment failed in native core.")
     }
@@ -74,13 +74,13 @@ class VaaniSession internal constructor(
         referenceText: String,
         audioSamples: FloatArray,
         sampleRate: Int
-    ): VaaniAssessmentResult?
+    ): OlineriAssessmentResult?
 }
 
 /**
  * Master offline runtime managing language packages and inference sessions.
  */
-class VaaniRuntime private constructor(
+class OlineriRuntime private constructor(
     private val runtimeHandle: Long,
     val storageDir: String
 ) : Closeable {
@@ -93,7 +93,7 @@ class VaaniRuntime private constructor(
      * @return Package ID string (e.g. "lang-ta", "lang-sa").
      */
     fun installPackage(packageDirectoryPath: String): String {
-        check(!isClosed) { "VaaniRuntime has been closed." }
+        check(!isClosed) { "OlineriRuntime has been closed." }
         return nativeInstallPackage(runtimeHandle, packageDirectoryPath)
             ?: throw IllegalArgumentException("Failed to install package from: $packageDirectoryPath")
     }
@@ -102,7 +102,7 @@ class VaaniRuntime private constructor(
      * Removes an installed language package and frees storage.
      */
     fun uninstallPackage(packageId: String): Boolean {
-        check(!isClosed) { "VaaniRuntime has been closed." }
+        check(!isClosed) { "OlineriRuntime has been closed." }
         return nativeUninstallPackage(runtimeHandle, packageId)
     }
 
@@ -110,13 +110,13 @@ class VaaniRuntime private constructor(
      * Creates an assessment session for an installed language.
      * @param languageTag BCP-47 language tag (e.g. "ta-IN", "sa-IN", "hi-IN", "te-IN").
      */
-    fun createSession(languageTag: String): VaaniSession {
-        check(!isClosed) { "VaaniRuntime has been closed." }
+    fun createSession(languageTag: String): OlineriSession {
+        check(!isClosed) { "OlineriRuntime has been closed." }
         val sessionHandle = nativeCreateSession(runtimeHandle, languageTag)
         if (sessionHandle == 0L) {
             throw IllegalArgumentException("Cannot create session for language '$languageTag'. Package may not be installed.")
         }
-        return VaaniSession(sessionHandle, languageTag)
+        return OlineriSession(sessionHandle, languageTag)
     }
 
     override fun close() {
@@ -133,20 +133,20 @@ class VaaniRuntime private constructor(
 
     companion object {
         init {
-            System.loadLibrary("vaani_core")
-            System.loadLibrary("vaani_jni")
+            System.loadLibrary("olineri_core")
+            System.loadLibrary("olineri_jni")
         }
 
         /**
-         * Initializes the offline Vaani SDK runtime.
+         * Initializes the offline Olineri SDK runtime.
          */
         @JvmStatic
-        fun initialize(storageDirectory: String): VaaniRuntime {
+        fun initialize(storageDirectory: String): OlineriRuntime {
             val handle = nativeCreate(storageDirectory)
             if (handle == 0L) {
-                throw IllegalStateException("Failed to initialize Vaani native runtime at: $storageDirectory")
+                throw IllegalStateException("Failed to initialize Olineri native runtime at: $storageDirectory")
             }
-            return VaaniRuntime(handle, storageDirectory)
+            return OlineriRuntime(handle, storageDirectory)
         }
 
         @JvmStatic

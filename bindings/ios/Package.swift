@@ -2,21 +2,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "VaaniSDK",
+    name: "OlineriSDK",
     platforms: [
         .iOS(.v13),
         .macOS(.v11)
     ],
     products: [
         .library(
-            name: "VaaniSDK",
-            targets: ["VaaniSDK"]
+            name: "OlineriSDK",
+            targets: ["OlineriSDK"]
         ),
     ],
     targets: [
         .target(
-            name: "CVaani",
-            path: "Sources/CVaani",
+            name: "COlineri",
+            path: "Sources/COlineri",
             sources: [
                 "../../../../core/src/crypto.cpp",
                 "../../../../core/src/manifest.cpp",
@@ -33,14 +33,14 @@ let package = Package(
             ]
         ),
         .target(
-            name: "VaaniSDK",
-            dependencies: ["CVaani"],
-            path: "Sources/VaaniSDK"
+            name: "OlineriSDK",
+            dependencies: ["COlineri"],
+            path: "Sources/OlineriSDK"
         ),
         .testTarget(
-            name: "VaaniSDKTests",
-            dependencies: ["VaaniSDK"],
-            path: "Tests/VaaniSDKTests"
+            name: "OlineriSDKTests",
+            dependencies: ["OlineriSDK"],
+            path: "Tests/OlineriSDKTests"
         )
     ],
     cxxLanguageStandard: .cxx17

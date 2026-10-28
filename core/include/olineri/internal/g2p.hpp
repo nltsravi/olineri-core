@@ -1,12 +1,12 @@
-#ifndef VAANI_INTERNAL_G2P_HPP
-#define VAANI_INTERNAL_G2P_HPP
+#ifndef OLINERI_INTERNAL_G2P_HPP
+#define OLINERI_INTERNAL_G2P_HPP
 
 #include <string>
 #include <vector>
 #include <cstdint>
-#include "vaani/internal/scoring_engine.hpp"
+#include "olineri/internal/scoring_engine.hpp"
 
-namespace vaani {
+namespace olineri {
 namespace g2p {
 
 struct G2PConfig {
@@ -33,6 +33,6 @@ private:
 };
 
 } // namespace g2p
-} // namespace vaani
+} // namespace olineri
 
-#endif // VAANI_INTERNAL_G2P_HPP
+#endif // OLINERI_INTERNAL_G2P_HPP

@@ -1,5 +1,5 @@
 // ============================================================================
-// Vaani Core SDK — Hybrid Pronunciation Assessment Demonstration
+// Olineri Core SDK — Hybrid Pronunciation Assessment Demonstration
 // 100% Offline Architecture: C ABI -> Hybrid Bridge -> UI
 // ============================================================================
 
@@ -489,7 +489,7 @@ async function toggleRecording() {
   }
 }
 
-// Run Assessment Simulation (Faithful to Vaani Core)
+// Run Assessment Simulation (Faithful to Olineri Core)
 function runAssessmentSimulation(injectError) {
   const text = document.getElementById("reference-text-input").value.trim();
   const langData = LINGUISTIC_DATABASE[activeLanguageTag];

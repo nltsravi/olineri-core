@@ -1,4 +1,4 @@
-name: Vaani Core CI
+name: Olineri Core CI
 
 on:
   push:

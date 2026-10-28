@@ -1,4 +1,4 @@
-# Vaani Core SDK — Feature & Language Support Matrix
+# Olineri Core SDK — Feature & Language Support Matrix
 
 This matrix documents the verification and implementation status across platforms and languages for **v0.1.0**.
 
@@ -38,9 +38,9 @@ This matrix documents the verification and implementation status across platform
 
 | Platform / Framework | Binding Layer | Status | Delivery Artifact |
 | :--- | :--- | :--- | :--- |
-| **Android** | Kotlin / JNI | **Implemented** | `com.vaani.core.VaaniSDK` + `libvaani_jni.so` |
-| **iOS** | Swift / SPM | **Implemented** | `VaaniSDK` Swift Package + Clang modulemap |
-| **React Native** | TypeScript + Bridge | **Implemented** | `@vaani/react-native-sdk` (Android Kotlin + iOS Obj-C++) |
-| **Flutter** | Dart / FFI | **Implemented** | `vaani_flutter` package with `dart:ffi` |
-| **Capacitor / Ionic** | TypeScript + Plugin | **Implemented** | `@vaani/capacitor-plugin` with web fallback |
+| **Android** | Kotlin / JNI | **Implemented** | `com.olineri.core.OlineriSDK` + `libolineri_jni.so` |
+| **iOS** | Swift / SPM | **Implemented** | `OlineriSDK` Swift Package + Clang modulemap |
+| **React Native** | TypeScript + Bridge | **Implemented** | `@olineri/react-native-sdk` (Android Kotlin + iOS Obj-C++) |
+| **Flutter** | Dart / FFI | **Implemented** | `olineri_flutter` package with `dart:ffi` |
+| **Capacitor / Ionic** | TypeScript + Plugin | **Implemented** | `@olineri/capacitor-plugin` with web fallback |
 | **WebAssembly** | Emscripten | *Candidate Prototype* | C++ core compiles cleanly with emscripten |

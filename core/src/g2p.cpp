@@ -1,7 +1,7 @@
-#include "vaani/internal/g2p.hpp"
+#include "olineri/internal/g2p.hpp"
 #include <map>
 
-namespace vaani {
+namespace olineri {
 namespace g2p {
 
 namespace {
@@ -769,4 +769,4 @@ std::vector<scoring::PhonemeTarget> BrahmicG2P::convert_telugu(const std::string
 }
 
 } // namespace g2p
-} // namespace vaani
+} // namespace olineri

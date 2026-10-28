@@ -1,12 +1,12 @@
-#ifndef VAANI_INTERNAL_SCORING_ENGINE_HPP
-#define VAANI_INTERNAL_SCORING_ENGINE_HPP
+#ifndef OLINERI_INTERNAL_SCORING_ENGINE_HPP
+#define OLINERI_INTERNAL_SCORING_ENGINE_HPP
 
 #include <string>
 #include <vector>
 #include <memory>
-#include "vaani/vaani_c_api.h"
+#include "olineri/olineri_c_api.h"
 
-namespace vaani {
+namespace olineri {
 namespace scoring {
 
 struct PhonemeTarget {
@@ -22,7 +22,7 @@ struct PhonemeResult {
     std::string expected_phoneme;
     std::string detected_phoneme;
     float score = 0.0f;
-    vaani_phoneme_status_t status = VAANI_PHONEME_CORRECT;
+    olineri_phoneme_status_t status = OLINERI_PHONEME_CORRECT;
     uint32_t char_start_utf8 = 0;
     uint32_t char_end_utf8 = 0;
     uint32_t cluster_index = 0;
@@ -74,6 +74,6 @@ private:
 };
 
 } // namespace scoring
-} // namespace vaani
+} // namespace olineri
 
-#endif // VAANI_INTERNAL_SCORING_ENGINE_HPP
+#endif // OLINERI_INTERNAL_SCORING_ENGINE_HPP

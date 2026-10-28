@@ -1,9 +1,9 @@
 import { registerPlugin } from '@capacitor/core';
-import type { VaaniCapacitorPlugin } from './definitions';
+import type { OlineriCapacitorPlugin } from './definitions';
 
-const Vaani = registerPlugin<VaaniCapacitorPlugin>('Vaani', {
-  web: () => import('./web').then(m => new m.VaaniWeb()),
+const Olineri = registerPlugin<OlineriCapacitorPlugin>('Olineri', {
+  web: () => import('./web').then(m => new m.OlineriWeb()),
 });
 
 export * from './definitions';
-export { Vaani };
+export { Olineri };

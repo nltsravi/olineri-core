@@ -1,0 +1,19 @@
+# Build directories
+build/
+bin/
+/lib/
+*.o
+*.a
+*.dylib
+*.so
+*.dll
+
+# IDE and OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Testing temporary outputs
+/tmp/olineri_*
+.gradle/

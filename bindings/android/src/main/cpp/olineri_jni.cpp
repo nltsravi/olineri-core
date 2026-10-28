@@ -1,91 +1,91 @@
 #include <jni.h>
 #include <string>
 #include <vector>
-#include "vaani/vaani_c_api.h"
+#include "olineri/olineri_c_api.h"
 
 extern "C" {
 
 JNIEXPORT jlong JNICALL
-Java_com_vaani_core_VaaniRuntime_nativeCreate(JNIEnv* env, jobject /* this */, jstring storageDir) {
+Java_com_olineri_core_OlineriRuntime_nativeCreate(JNIEnv* env, jobject /* this */, jstring storageDir) {
     const char* dir = env->GetStringUTFChars(storageDir, nullptr);
-    vaani_runtime_handle_t runtime = nullptr;
-    vaani_status_t status = vaani_runtime_create(dir, &runtime);
+    olineri_runtime_handle_t runtime = nullptr;
+    olineri_status_t status = olineri_runtime_create(dir, &runtime);
     env->ReleaseStringUTFChars(storageDir, dir);
 
-    if (status != VAANI_OK) {
+    if (status != OLINERI_OK) {
         return 0;
     }
     return reinterpret_cast<jlong>(runtime);
 }
 
 JNIEXPORT void JNICALL
-Java_com_vaani_core_VaaniRuntime_nativeDestroy(JNIEnv* /* env */, jobject /* this */, jlong handle) {
+Java_com_olineri_core_OlineriRuntime_nativeDestroy(JNIEnv* /* env */, jobject /* this */, jlong handle) {
     if (handle != 0) {
-        vaani_runtime_destroy(reinterpret_cast<vaani_runtime_handle_t>(handle));
+        olineri_runtime_destroy(reinterpret_cast<olineri_runtime_handle_t>(handle));
     }
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_vaani_core_VaaniRuntime_nativeInstallPackage(JNIEnv* env, jobject /* this */, jlong handle, jstring packagePath) {
+Java_com_olineri_core_OlineriRuntime_nativeInstallPackage(JNIEnv* env, jobject /* this */, jlong handle, jstring packagePath) {
     if (handle == 0) return nullptr;
 
     const char* path = env->GetStringUTFChars(packagePath, nullptr);
     char out_id[64] = {0};
-    vaani_status_t status = vaani_package_install(
-        reinterpret_cast<vaani_runtime_handle_t>(handle),
+    olineri_status_t status = olineri_package_install(
+        reinterpret_cast<olineri_runtime_handle_t>(handle),
         path,
         out_id,
         sizeof(out_id)
     );
     env->ReleaseStringUTFChars(packagePath, path);
 
-    if (status != VAANI_OK) {
+    if (status != OLINERI_OK) {
         return nullptr;
     }
     return env->NewStringUTF(out_id);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_vaani_core_VaaniRuntime_nativeUninstallPackage(JNIEnv* env, jobject /* this */, jlong handle, jstring packageId) {
+Java_com_olineri_core_OlineriRuntime_nativeUninstallPackage(JNIEnv* env, jobject /* this */, jlong handle, jstring packageId) {
     if (handle == 0) return JNI_FALSE;
 
     const char* id = env->GetStringUTFChars(packageId, nullptr);
-    vaani_status_t status = vaani_package_uninstall(
-        reinterpret_cast<vaani_runtime_handle_t>(handle),
+    olineri_status_t status = olineri_package_uninstall(
+        reinterpret_cast<olineri_runtime_handle_t>(handle),
         id
     );
     env->ReleaseStringUTFChars(packageId, id);
-    return (status == VAANI_OK) ? JNI_TRUE : JNI_FALSE;
+    return (status == OLINERI_OK) ? JNI_TRUE : JNI_FALSE;
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_vaani_core_VaaniSession_nativeCreate(JNIEnv* env, jobject /* this */, jlong runtimeHandle, jstring languageTag) {
+Java_com_olineri_core_OlineriSession_nativeCreate(JNIEnv* env, jobject /* this */, jlong runtimeHandle, jstring languageTag) {
     if (runtimeHandle == 0) return 0;
 
     const char* lang = env->GetStringUTFChars(languageTag, nullptr);
-    vaani_session_handle_t session = nullptr;
-    vaani_status_t status = vaani_session_create(
-        reinterpret_cast<vaani_runtime_handle_t>(runtimeHandle),
+    olineri_session_handle_t session = nullptr;
+    olineri_status_t status = olineri_session_create(
+        reinterpret_cast<olineri_runtime_handle_t>(runtimeHandle),
         lang,
         &session
     );
     env->ReleaseStringUTFChars(languageTag, lang);
 
-    if (status != VAANI_OK) {
+    if (status != OLINERI_OK) {
         return 0;
     }
     return reinterpret_cast<jlong>(session);
 }
 
 JNIEXPORT void JNICALL
-Java_com_vaani_core_VaaniSession_nativeDestroy(JNIEnv* /* env */, jobject /* this */, jlong sessionHandle) {
+Java_com_olineri_core_OlineriSession_nativeDestroy(JNIEnv* /* env */, jobject /* this */, jlong sessionHandle) {
     if (sessionHandle != 0) {
-        vaani_session_destroy(reinterpret_cast<vaani_session_handle_t>(sessionHandle));
+        olineri_session_destroy(reinterpret_cast<olineri_session_handle_t>(sessionHandle));
     }
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_vaani_core_VaaniSession_nativeAssessPronunciation(
+Java_com_olineri_core_OlineriSession_nativeAssessPronunciation(
     JNIEnv* env,
     jobject /* this */,
     jlong sessionHandle,
@@ -99,9 +99,9 @@ Java_com_vaani_core_VaaniSession_nativeAssessPronunciation(
     jsize sample_count = env->GetArrayLength(audioSamples);
     jfloat* samples = env->GetFloatArrayElements(audioSamples, nullptr);
 
-    vaani_result_handle_t result = nullptr;
-    vaani_status_t status = vaani_assess_pronunciation(
-        reinterpret_cast<vaani_session_handle_t>(sessionHandle),
+    olineri_result_handle_t result = nullptr;
+    olineri_status_t status = olineri_assess_pronunciation(
+        reinterpret_cast<olineri_session_handle_t>(sessionHandle),
         text,
         samples,
         static_cast<uint32_t>(sample_count),
@@ -112,18 +112,18 @@ Java_com_vaani_core_VaaniSession_nativeAssessPronunciation(
     env->ReleaseFloatArrayElements(audioSamples, samples, JNI_ABORT);
     env->ReleaseStringUTFChars(referenceText, text);
 
-    if (status != VAANI_OK || result == nullptr) {
+    if (status != OLINERI_OK || result == nullptr) {
         return nullptr;
     }
 
-    float overall_score = vaani_result_get_overall_score(result);
-    uint32_t phoneme_count = vaani_result_get_phoneme_count(result);
+    float overall_score = olineri_result_get_overall_score(result);
+    uint32_t phoneme_count = olineri_result_get_phoneme_count(result);
 
     // Find Kotlin classes
-    jclass resultClass = env->FindClass("com/vaani/core/VaaniAssessmentResult");
+    jclass resultClass = env->FindClass("com/olineri/core/OlineriAssessmentResult");
     jmethodID resultCtor = env->GetMethodID(resultClass, "<init>", "(FLjava/util/List;)V");
 
-    jclass feedbackClass = env->FindClass("com/vaani/core/PhonemeFeedback");
+    jclass feedbackClass = env->FindClass("com/olineri/core/PhonemeFeedback");
     jmethodID feedbackCtor = env->GetMethodID(feedbackClass, "<init>", "(Ljava/lang/String;IFII)V");
 
     jclass listClass = env->FindClass("java/util/ArrayList");
@@ -133,8 +133,8 @@ Java_com_vaani_core_VaaniSession_nativeAssessPronunciation(
     jobject feedbackList = env->NewObject(listClass, listCtor);
 
     for (uint32_t i = 0; i < phoneme_count; ++i) {
-        vaani_phoneme_feedback_t fb;
-        if (vaani_result_get_phoneme_feedback(result, i, &fb) == VAANI_OK) {
+        olineri_phoneme_feedback_t fb;
+        if (olineri_result_get_phoneme_feedback(result, i, &fb) == OLINERI_OK) {
             jstring expPhoneme = env->NewStringUTF(fb.expected_phoneme);
             jobject fbObj = env->NewObject(
                 feedbackClass,
@@ -153,7 +153,7 @@ Java_com_vaani_core_VaaniSession_nativeAssessPronunciation(
 
     jobject resultObj = env->NewObject(resultClass, resultCtor, overall_score, feedbackList);
 
-    vaani_result_destroy(result);
+    olineri_result_destroy(result);
     return resultObj;
 }
 

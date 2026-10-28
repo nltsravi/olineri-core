@@ -1,4 +1,4 @@
-# Vaani Core SDK — Known Limitations & Technical Constraints
+# Olineri Core SDK — Known Limitations & Technical Constraints
 
 In adherence to strict engineering honesty, this document outlines known limitations, trade-offs, and boundary conditions in **v0.1.0**.
 
@@ -8,7 +8,7 @@ In adherence to strict engineering honesty, this document outlines known limitat
 
 1. **Acoustic Noise & Low-SNR Environments:**
    - Pronunciation assessment relies on frame-level acoustic posteriors. In environments with heavy background babble, ambient music, or signal-to-noise ratio (SNR) $< 12\text{ dB}$, acoustic likelihoods drop.
-   - **Mitigation:** The engine classifies segments with low posterior confidence as `VAANI_PHONEME_UNCERTAIN` rather than asserting a false substitution. Applications should prompt the user to record in a quieter setting.
+   - **Mitigation:** The engine classifies segments with low posterior confidence as `OLINERI_PHONEME_UNCERTAIN` rather than asserting a false substitution. Applications should prompt the user to record in a quieter setting.
 2. **Audio Sample Rate and Channels:**
    - The IndicConformer CTC model requires 16,000 Hz, 16-bit mono PCM. Audio recorded at 44.1 kHz or 48 kHz must be resampled prior to inference.
 
@@ -23,7 +23,7 @@ Indian languages feature rich dialectal variations that do not necessarily repre
    - In Sri Lankan / Jaffna Tamil, retroflex sounds and archaic contrasts are preserved differently than in Tamil Nadu dialects.
 2. **Hindi:**
    - Regional Hindi speakers from eastern regions (Bihar, UP) may pronounce dental `/s/` for palatal `/ʃ/` (श) or vice-versa.
-   - Schwa deletion in Sanskrit loanwords (Tatsama) differs from colloquial Hindustani (Tadbhav). While `vaani-core` applies standard 2-tier rules, irregular Sanskrit borrowings may retain internal schwas.
+   - Schwa deletion in Sanskrit loanwords (Tatsama) differs from colloquial Hindustani (Tadbhav). While `olineri-core` applies standard 2-tier rules, irregular Sanskrit borrowings may retain internal schwas.
 3. **Telugu:**
    - Coastal Andhra, Rayalaseema, and Telangana dialects exhibit variations in vowel openness and aspirate strength. Spoken Telugu frequently elides certain unaccented vowels in fast conversational speech.
 
@@ -40,7 +40,7 @@ Indian languages feature rich dialectal variations that do not necessarily repre
 ## 4. Script & Transliteration Limitations
 
 - **Sanskrit:** The initial engine processes Sanskrit in Devanagari script. While Tamil-script Sanskrit (Grantha conventions) is structurally supported by the C ABI architecture, full Grantha ligatures require unicode decomposition preprocessing.
-- **English/Latin Transliteration (IAST / ISO 15919):** Not included in the core v0.1.0 runtime; applications must convert IAST to native Brahmic scripts prior to calling `vaani_assess_pronunciation`.
+- **English/Latin Transliteration (IAST / ISO 15919):** Not included in the core v0.1.0 runtime; applications must convert IAST to native Brahmic scripts prior to calling `olineri_assess_pronunciation`.
 
 ---
 

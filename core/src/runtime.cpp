@@ -1,109 +1,106 @@
-#include "vaani/vaani_c_api.h"
-#include "vaani/internal/package_manager.hpp"
-#include "vaani/internal/scoring_engine.hpp"
-#include "vaani/internal/inference_engine.hpp"
-#include "vaani/internal/filesystem.hpp"
-#include "vaani/internal/g2p.hpp"
+#include "olineri/olineri_c_api.h"
+#include "olineri/internal/package_manager.hpp"
+#include "olineri/internal/scoring_engine.hpp"
+#include "olineri/internal/inference_engine.hpp"
+#include "olineri/internal/filesystem.hpp"
+#include "olineri/internal/g2p.hpp"
 #include "backends/mock/mock_engine.hpp"
 
 #include <string>
 #include <vector>
 #include <memory>
 #include <mutex>
+#include <algorithm>
 #include <cstring>
-
-/* ========================================================================= */
-/* Internal Struct Definitions for Opaque Handles                            */
-/* ========================================================================= */
-
-struct vaani_session_s;
-
-struct vaani_runtime_s {
-    std::string storage_dir;
-    std::unique_ptr<vaani::pkg::PackageManager> package_manager;
-    std::mutex sessions_mutex;
-    std::vector<vaani_session_s*> active_sessions;
-};
-
-struct vaani_session_s {
-    vaani_runtime_s* runtime = nullptr;
-    std::string language_tag;
-    vaani::manifest::PackageManifest manifest;
-    std::unique_ptr<vaani::inference::InferenceEngine> engine;
-    std::unique_ptr<vaani::scoring::ScoringEngine> scorer;
-    std::unique_ptr<vaani::g2p::BrahmicG2P> g2p;
-};
-
-struct vaani_result_s {
-    vaani::scoring::AssessmentOutput output;
-    std::vector<std::string> feedback_strings;
-    std::vector<std::string> expected_phonemes;
-    std::vector<std::string> detected_phonemes;
-};
-
-/* ========================================================================= */
-/* C ABI Implementation                                                      */
-/* ========================================================================= */
 
 extern "C" {
 
-VAANI_API const char* vaani_version(void) {
-    return VAANI_VERSION_STRING;
+struct olineri_session_s;
+
+struct olineri_runtime_s {
+    std::string storage_dir;
+    std::unique_ptr<olineri::pkg::PackageManager> package_manager;
+    std::mutex sessions_mutex;
+    std::vector<olineri_session_s*> active_sessions;
+};
+
+struct olineri_session_s {
+    olineri_runtime_s* runtime = nullptr;
+    std::string language_tag;
+    olineri::manifest::PackageManifest manifest;
+    std::unique_ptr<olineri::inference::InferenceEngine> engine;
+    std::unique_ptr<olineri::scoring::ScoringEngine> scorer;
+    std::unique_ptr<olineri::g2p::BrahmicG2P> g2p;
+};
+
+struct olineri_result_s {
+    olineri::scoring::AssessmentOutput output;
+    std::vector<std::string> expected_phonemes;
+    std::vector<std::string> detected_phonemes;
+    std::vector<std::string> feedback_strings;
+};
+
+/* ========================================================================= */
+/* Runtime Lifecycle Functions                                               */
+/* ========================================================================= */
+
+OLINERI_API const char* olineri_version(void) {
+    return OLINERI_VERSION_STRING;
 }
 
-VAANI_API const char* vaani_status_message(vaani_status_t status) {
+OLINERI_API const char* olineri_status_message(olineri_status_t status) {
     switch (status) {
-        case VAANI_OK: return "Success";
-        case VAANI_ERR_INVALID_ARGUMENT: return "Invalid argument provided";
-        case VAANI_ERR_OUT_OF_MEMORY: return "Out of memory";
-        case VAANI_ERR_STORAGE_UNWRITABLE: return "Storage directory is not writable";
-        case VAANI_ERR_PACKAGE_NOT_FOUND: return "Language package not found";
-        case VAANI_ERR_PACKAGE_CORRUPTED: return "Language package is corrupted or failed checksum verification";
-        case VAANI_ERR_SIGNATURE_INVALID: return "Digital signature verification failed";
-        case VAANI_ERR_INCOMPATIBLE_VERSION: return "Package is incompatible with this SDK version";
-        case VAANI_ERR_PATH_TRAVERSAL: return "Security violation: archive contains path traversal sequence";
-        case VAANI_ERR_ARCHIVE_BOMB: return "Security violation: archive exceeds safe decompression limit";
-        case VAANI_ERR_AUDIO_INVALID: return "Audio buffer is empty, null, or contains invalid float values";
-        case VAANI_ERR_AUDIO_TOO_QUIET: return "Audio level is too quiet or silent";
-        case VAANI_ERR_AUDIO_CLIPPED: return "Audio is severely clipped or distorted";
-        case VAANI_ERR_INFERENCE_FAILED: return "Acoustic inference execution failed";
-        case VAANI_ERR_RESOURCE_BUSY: return "Resource is currently locked by an active session";
-        case VAANI_ERR_CANCELLED: return "Operation was cancelled";
-        case VAANI_ERR_NOT_INITIALIZED: return "Runtime or session is not initialized";
-        case VAANI_ERR_INTERNAL: return "Internal runtime error";
-        default: return "Unknown error";
+        case OLINERI_OK: return "Success";
+        case OLINERI_ERR_INVALID_ARGUMENT: return "Invalid argument or null pointer";
+        case OLINERI_ERR_OUT_OF_MEMORY: return "Out of memory";
+        case OLINERI_ERR_STORAGE_UNWRITABLE: return "Storage directory unwritable or disk full";
+        case OLINERI_ERR_PACKAGE_NOT_FOUND: return "Language package not found";
+        case OLINERI_ERR_PACKAGE_CORRUPTED: return "Package corrupted or artifact hash mismatch";
+        case OLINERI_ERR_SIGNATURE_INVALID: return "Package digital signature invalid or untrusted";
+        case OLINERI_ERR_INCOMPATIBLE_VERSION: return "Package incompatible with SDK version";
+        case OLINERI_ERR_PATH_TRAVERSAL: return "Security violation: path traversal detected";
+        case OLINERI_ERR_ARCHIVE_BOMB: return "Security violation: archive bomb detected";
+        case OLINERI_ERR_AUDIO_INVALID: return "Invalid audio format, duration, or sample rate";
+        case OLINERI_ERR_AUDIO_TOO_QUIET: return "Audio level too quiet or below noise floor";
+        case OLINERI_ERR_AUDIO_CLIPPED: return "Audio clipped or severely distorted";
+        case OLINERI_ERR_INFERENCE_FAILED: return "Acoustic model inference failed";
+        case OLINERI_ERR_RESOURCE_BUSY: return "Inference resource busy or limit reached";
+        case OLINERI_ERR_CANCELLED: return "Operation cancelled by host application";
+        case OLINERI_ERR_NOT_INITIALIZED: return "Runtime or session not initialized";
+        case OLINERI_ERR_INTERNAL: return "Internal engine error";
+        default: return "Unknown status code";
     }
 }
 
-VAANI_API vaani_status_t vaani_runtime_create(
+OLINERI_API olineri_status_t olineri_runtime_create(
     const char* storage_directory,
-    vaani_runtime_handle_t* out_runtime
+    olineri_runtime_handle_t* out_runtime
 ) {
     if (!storage_directory || !out_runtime) {
-        return VAANI_ERR_INVALID_ARGUMENT;
+        return OLINERI_ERR_INVALID_ARGUMENT;
     }
 
-    if (!vaani::fs::create_directories(storage_directory)) {
-        return VAANI_ERR_STORAGE_UNWRITABLE;
+    if (!olineri::fs::create_directories(storage_directory)) {
+        return OLINERI_ERR_STORAGE_UNWRITABLE;
     }
 
     try {
-        auto rt = new vaani_runtime_s();
+        auto rt = new olineri_runtime_s();
         rt->storage_dir = storage_directory;
-        rt->package_manager = std::make_unique<vaani::pkg::PackageManager>(storage_directory);
+        rt->package_manager = std::make_unique<olineri::pkg::PackageManager>(storage_directory);
         *out_runtime = rt;
-        return VAANI_OK;
+        return OLINERI_OK;
     } catch (...) {
-        return VAANI_ERR_OUT_OF_MEMORY;
+        return OLINERI_ERR_OUT_OF_MEMORY;
     }
 }
 
-VAANI_API vaani_status_t vaani_runtime_destroy(
-    vaani_runtime_handle_t runtime
+OLINERI_API olineri_status_t olineri_runtime_destroy(
+    olineri_runtime_handle_t runtime
 ) {
-    if (!runtime) return VAANI_ERR_INVALID_ARGUMENT;
+    if (!runtime) return OLINERI_ERR_INVALID_ARGUMENT;
 
-    // Close any remaining active sessions
+    // Clean up all active sessions
     {
         std::lock_guard<std::mutex> lock(runtime->sessions_mutex);
         for (auto* session : runtime->active_sessions) {
@@ -113,65 +110,64 @@ VAANI_API vaani_status_t vaani_runtime_destroy(
     }
 
     delete runtime;
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
-VAANI_API vaani_status_t vaani_runtime_trim_memory(
-    vaani_runtime_handle_t runtime
+OLINERI_API olineri_status_t olineri_runtime_trim_memory(
+    olineri_runtime_handle_t runtime
 ) {
-    if (!runtime) return VAANI_ERR_INVALID_ARGUMENT;
+    if (!runtime) return OLINERI_ERR_INVALID_ARGUMENT;
+
     std::lock_guard<std::mutex> lock(runtime->sessions_mutex);
-    for (auto* s : runtime->active_sessions) {
-        if (s && s->engine) {
-            s->engine->unload();
+    for (auto* session : runtime->active_sessions) {
+        if (session->engine) {
+            session->engine->unload();
         }
     }
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
-VAANI_API vaani_status_t vaani_runtime_add_trusted_key(
-    vaani_runtime_handle_t runtime,
+OLINERI_API olineri_status_t olineri_runtime_add_trusted_key(
+    olineri_runtime_handle_t runtime,
     const char* key_id,
     const char* public_key_hex
 ) {
     if (!runtime || !key_id || !public_key_hex) {
-        return VAANI_ERR_INVALID_ARGUMENT;
+        return OLINERI_ERR_INVALID_ARGUMENT;
     }
     runtime->package_manager->add_trusted_key(key_id, public_key_hex);
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
-VAANI_API vaani_status_t vaani_package_install(
-    vaani_runtime_handle_t runtime,
+OLINERI_API olineri_status_t olineri_package_install(
+    olineri_runtime_handle_t runtime,
     const char* package_path,
     char* out_pkg_id,
     size_t pkg_id_size
 ) {
-    if (!runtime || !package_path) return VAANI_ERR_INVALID_ARGUMENT;
+    if (!runtime || !package_path) return OLINERI_ERR_INVALID_ARGUMENT;
 
     std::string installed_id;
-    vaani_status_t status = runtime->package_manager->install(package_path, installed_id);
-    if (status != VAANI_OK) return status;
-
-    if (out_pkg_id && pkg_id_size > 0) {
-        strncpy(out_pkg_id, installed_id.c_str(), pkg_id_size - 1);
+    olineri_status_t status = runtime->package_manager->install(package_path, installed_id);
+    if (status == OLINERI_OK && out_pkg_id && pkg_id_size > 0) {
+        std::strncpy(out_pkg_id, installed_id.c_str(), pkg_id_size - 1);
         out_pkg_id[pkg_id_size - 1] = '\0';
     }
-    return VAANI_OK;
+    return status;
 }
 
-VAANI_API vaani_status_t vaani_package_uninstall(
-    vaani_runtime_handle_t runtime,
+OLINERI_API olineri_status_t olineri_package_uninstall(
+    olineri_runtime_handle_t runtime,
     const char* package_id
 ) {
-    if (!runtime || !package_id) return VAANI_ERR_INVALID_ARGUMENT;
+    if (!runtime || !package_id) return OLINERI_ERR_INVALID_ARGUMENT;
 
-    // Prevent uninstalling while active in a session
+    // Check if an active session is using this package
     {
         std::lock_guard<std::mutex> lock(runtime->sessions_mutex);
-        for (const auto* s : runtime->active_sessions) {
-            if (s && s->manifest.package_id == package_id) {
-                return VAANI_ERR_RESOURCE_BUSY;
+        for (auto* session : runtime->active_sessions) {
+            if (session->manifest.package_id == package_id) {
+                return OLINERI_ERR_RESOURCE_BUSY;
             }
         }
     }
@@ -179,23 +175,23 @@ VAANI_API vaani_status_t vaani_package_uninstall(
     return runtime->package_manager->uninstall(package_id);
 }
 
-VAANI_API vaani_status_t vaani_package_rollback(
-    vaani_runtime_handle_t runtime,
+OLINERI_API olineri_status_t olineri_package_rollback(
+    olineri_runtime_handle_t runtime,
     const char* package_id
 ) {
-    if (!runtime || !package_id) return VAANI_ERR_INVALID_ARGUMENT;
+    if (!runtime || !package_id) return OLINERI_ERR_INVALID_ARGUMENT;
     return runtime->package_manager->rollback(package_id);
 }
 
-VAANI_API uint32_t vaani_package_count(
-    vaani_runtime_handle_t runtime
+OLINERI_API uint32_t olineri_package_count(
+    olineri_runtime_handle_t runtime
 ) {
     if (!runtime) return 0;
     return static_cast<uint32_t>(runtime->package_manager->list_installed().size());
 }
 
-VAANI_API vaani_status_t vaani_package_get_at(
-    vaani_runtime_handle_t runtime,
+OLINERI_API olineri_status_t olineri_package_get_at(
+    olineri_runtime_handle_t runtime,
     uint32_t index,
     char* out_package_id,
     size_t pkg_id_cap,
@@ -204,52 +200,54 @@ VAANI_API vaani_status_t vaani_package_get_at(
     char* out_version,
     size_t version_cap
 ) {
-    if (!runtime) return VAANI_ERR_INVALID_ARGUMENT;
-    auto list = runtime->package_manager->list_installed();
-    if (index >= list.size()) return VAANI_ERR_INVALID_ARGUMENT;
+    if (!runtime) return OLINERI_ERR_INVALID_ARGUMENT;
+    auto pkgs = runtime->package_manager->list_installed();
+    if (index >= pkgs.size()) return OLINERI_ERR_INVALID_ARGUMENT;
 
-    const auto& pkg = list[index];
+    const auto& p = pkgs[index];
     if (out_package_id && pkg_id_cap > 0) {
-        strncpy(out_package_id, pkg.package_id.c_str(), pkg_id_cap - 1);
+        std::strncpy(out_package_id, p.package_id.c_str(), pkg_id_cap - 1);
         out_package_id[pkg_id_cap - 1] = '\0';
     }
     if (out_language_tag && lang_tag_cap > 0) {
-        strncpy(out_language_tag, pkg.language_tag.c_str(), lang_tag_cap - 1);
+        std::strncpy(out_language_tag, p.language_tag.c_str(), lang_tag_cap - 1);
         out_language_tag[lang_tag_cap - 1] = '\0';
     }
     if (out_version && version_cap > 0) {
-        strncpy(out_version, pkg.version.c_str(), version_cap - 1);
+        std::strncpy(out_version, p.version.c_str(), version_cap - 1);
         out_version[version_cap - 1] = '\0';
     }
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
-VAANI_API vaani_status_t vaani_session_create(
-    vaani_runtime_handle_t runtime,
+OLINERI_API olineri_status_t olineri_session_create(
+    olineri_runtime_handle_t runtime,
     const char* language_tag,
-    vaani_session_handle_t* out_session
+    olineri_session_handle_t* out_session
 ) {
-    if (!runtime || !language_tag || !out_session) return VAANI_ERR_INVALID_ARGUMENT;
+    if (!runtime || !language_tag || !out_session) {
+        return OLINERI_ERR_INVALID_ARGUMENT;
+    }
 
-    vaani::manifest::PackageManifest manifest;
+    olineri::manifest::PackageManifest manifest;
     if (!runtime->package_manager->find_by_language(language_tag, manifest)) {
-        return VAANI_ERR_PACKAGE_NOT_FOUND;
+        return OLINERI_ERR_PACKAGE_NOT_FOUND;
     }
 
     try {
-        auto session = new vaani_session_s();
+        auto session = new olineri_session_s();
         session->runtime = runtime;
         session->language_tag = language_tag;
         session->manifest = manifest;
 
-        // In Milestone 2, use the deterministic MockEngine (swappable with ONNX/sherpa-onnx in M3)
-        auto mock = std::make_unique<vaani::backends::MockEngine>(64, 0);
+        // Create inference engine (MockEngine in initial core, Sherpa/ONNX in extension)
+        auto mock = std::make_unique<olineri::backends::MockEngine>(64, 0);
         std::string pkg_dir = runtime->package_manager->get_package_dir(manifest.package_id);
         mock->load_model(pkg_dir, manifest.model.id);
 
         session->engine = std::move(mock);
-        session->scorer = std::make_unique<vaani::scoring::ScoringEngine>();
-        session->g2p = std::make_unique<vaani::g2p::BrahmicG2P>(vaani::g2p::G2PConfig{language_tag, true, true});
+        session->scorer = std::make_unique<olineri::scoring::ScoringEngine>();
+        session->g2p = std::make_unique<olineri::g2p::BrahmicG2P>(olineri::g2p::G2PConfig{language_tag, true, true});
 
         {
             std::lock_guard<std::mutex> lock(runtime->sessions_mutex);
@@ -257,16 +255,16 @@ VAANI_API vaani_status_t vaani_session_create(
         }
 
         *out_session = session;
-        return VAANI_OK;
+        return OLINERI_OK;
     } catch (...) {
-        return VAANI_ERR_OUT_OF_MEMORY;
+        return OLINERI_ERR_OUT_OF_MEMORY;
     }
 }
 
-VAANI_API vaani_status_t vaani_session_destroy(
-    vaani_session_handle_t session
+OLINERI_API olineri_status_t olineri_session_destroy(
+    olineri_session_handle_t session
 ) {
-    if (!session || !session->runtime) return VAANI_ERR_INVALID_ARGUMENT;
+    if (!session || !session->runtime) return OLINERI_ERR_INVALID_ARGUMENT;
 
     auto* rt = session->runtime;
     {
@@ -278,32 +276,32 @@ VAANI_API vaani_status_t vaani_session_destroy(
     }
 
     delete session;
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
-VAANI_API vaani_status_t vaani_assess_pronunciation(
-    vaani_session_handle_t session,
+OLINERI_API olineri_status_t olineri_assess_pronunciation(
+    olineri_session_handle_t session,
     const char* reference_text,
     const float* audio_samples,
     uint32_t sample_count,
     uint32_t sample_rate,
-    vaani_result_handle_t* out_result
+    olineri_result_handle_t* out_result
 ) {
     if (!session || !reference_text || !audio_samples || !out_result) {
-        return VAANI_ERR_INVALID_ARGUMENT;
+        return OLINERI_ERR_INVALID_ARGUMENT;
     }
     if (sample_count == 0 || sample_rate == 0) {
-        return VAANI_ERR_AUDIO_INVALID;
+        return OLINERI_ERR_AUDIO_INVALID;
     }
 
     // 1. Convert reference text using Unicode-aware Brahmic G2P engine
-    std::vector<vaani::scoring::PhonemeTarget> targets = session->g2p->convert(reference_text);
+    std::vector<olineri::scoring::PhonemeTarget> targets = session->g2p->convert(reference_text);
     if (targets.empty()) {
-        return VAANI_ERR_INVALID_ARGUMENT;
+        return OLINERI_ERR_INVALID_ARGUMENT;
     }
 
     // For MockEngine: configure the expected token sequence
-    auto* mock = dynamic_cast<vaani::backends::MockEngine*>(session->engine.get());
+    auto* mock = dynamic_cast<olineri::backends::MockEngine*>(session->engine.get());
     if (mock) {
         std::vector<uint32_t> expected_tokens;
         for (const auto& t : targets) expected_tokens.push_back(t.token_id);
@@ -311,16 +309,16 @@ VAANI_API vaani_status_t vaani_assess_pronunciation(
     }
 
     // 2. Run inference to get frame acoustic posteriors
-    vaani::scoring::AcousticEmission emission;
-    vaani_status_t status = session->engine->infer(audio_samples, sample_count, sample_rate, emission);
-    if (status != VAANI_OK) return status;
+    olineri::scoring::AcousticEmission emission;
+    olineri_status_t status = session->engine->infer(audio_samples, sample_count, sample_rate, emission);
+    if (status != OLINERI_OK) return status;
 
     // 3. Align and score
     auto output = session->scorer->assess(targets, emission);
 
     // 4. Wrap into result struct
     try {
-        auto res = new vaani_result_s();
+        auto res = new olineri_result_s();
         res->output = std::move(output);
 
         // Pre-cache C-compatible strings
@@ -331,33 +329,33 @@ VAANI_API vaani_status_t vaani_assess_pronunciation(
         }
 
         *out_result = res;
-        return VAANI_OK;
+        return OLINERI_OK;
     } catch (...) {
-        return VAANI_ERR_OUT_OF_MEMORY;
+        return OLINERI_ERR_OUT_OF_MEMORY;
     }
 }
 
-VAANI_API float vaani_result_get_overall_score(
-    vaani_result_handle_t result
+OLINERI_API float olineri_result_get_overall_score(
+    olineri_result_handle_t result
 ) {
     if (!result) return 0.0f;
     return result->output.overall_score;
 }
 
-VAANI_API uint32_t vaani_result_get_phoneme_count(
-    vaani_result_handle_t result
+OLINERI_API uint32_t olineri_result_get_phoneme_count(
+    olineri_result_handle_t result
 ) {
     if (!result) return 0;
     return static_cast<uint32_t>(result->output.phonemes.size());
 }
 
-VAANI_API vaani_status_t vaani_result_get_phoneme_feedback(
-    vaani_result_handle_t result,
+OLINERI_API olineri_status_t olineri_result_get_phoneme_feedback(
+    olineri_result_handle_t result,
     uint32_t index,
-    vaani_phoneme_feedback_t* out_feedback
+    olineri_phoneme_feedback_t* out_feedback
 ) {
-    if (!result || !out_feedback) return VAANI_ERR_INVALID_ARGUMENT;
-    if (index >= result->output.phonemes.size()) return VAANI_ERR_INVALID_ARGUMENT;
+    if (!result || !out_feedback) return OLINERI_ERR_INVALID_ARGUMENT;
+    if (index >= result->output.phonemes.size()) return OLINERI_ERR_INVALID_ARGUMENT;
 
     const auto& src = result->output.phonemes[index];
     out_feedback->expected_phoneme = result->expected_phonemes[index].c_str();
@@ -372,18 +370,18 @@ VAANI_API vaani_status_t vaani_result_get_phoneme_feedback(
     out_feedback->end_time_ms = src.end_time_ms;
     out_feedback->feedback_instruction = result->feedback_strings[index].c_str();
 
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
-VAANI_API const char* vaani_result_get_recognized_text(
-    vaani_result_handle_t result
+OLINERI_API const char* olineri_result_get_recognized_text(
+    olineri_result_handle_t result
 ) {
     if (!result) return "";
     return result->output.recognized_text.c_str();
 }
 
-VAANI_API void vaani_result_destroy(
-    vaani_result_handle_t result
+OLINERI_API void olineri_result_destroy(
+    olineri_result_handle_t result
 ) {
     delete result;
 }

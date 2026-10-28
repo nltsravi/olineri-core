@@ -1,5 +1,5 @@
-#ifndef VAANI_INTERNAL_FILESYSTEM_HPP
-#define VAANI_INTERNAL_FILESYSTEM_HPP
+#ifndef OLINERI_INTERNAL_FILESYSTEM_HPP
+#define OLINERI_INTERNAL_FILESYSTEM_HPP
 
 #include <string>
 #include <vector>
@@ -10,7 +10,7 @@
 #include <dirent.h>
 #include <cstdio>
 
-namespace vaani {
+namespace olineri {
 namespace fs {
 
 inline bool is_safe_relative_path(const std::string& path) {
@@ -106,6 +106,6 @@ inline bool write_string_to_file(const std::string& path, const std::string& con
 }
 
 } // namespace fs
-} // namespace vaani
+} // namespace olineri
 
-#endif // VAANI_INTERNAL_FILESYSTEM_HPP
+#endif // OLINERI_INTERNAL_FILESYSTEM_HPP

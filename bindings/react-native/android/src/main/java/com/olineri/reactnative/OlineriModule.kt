@@ -1,16 +1,16 @@
-package com.vaani.reactnative
+package com.olineri.reactnative
 
 import com.facebook.react.bridge.*
-import com.vaani.core.VaaniRuntime
-import com.vaani.core.VaaniSession
+import com.olineri.core.OlineriRuntime
+import com.olineri.core.OlineriSession
 import java.io.File
 
-class VaaniModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class OlineriModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
-    private var runtime: VaaniRuntime? = null
-    private val activeSessions = mutableMapOf<String, VaaniSession>()
+    private var runtime: OlineriRuntime? = null
+    private val activeSessions = mutableMapOf<String, OlineriSession>()
 
-    override fun getName(): String = "VaaniNativeBridge"
+    override fun getName(): String = "OlineriNativeBridge"
 
     @ReactMethod
     fun initializeRuntime(config: ReadableMap, promise: Promise) {
@@ -18,9 +18,9 @@ class VaaniModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             val storageDir = if (config.hasKey("storageDirectory")) {
                 config.getString("storageDirectory") ?: reactApplicationContext.filesDir.absolutePath
             } else {
-                File(reactApplicationContext.filesDir, "vaani_models").apply { mkdirs() }.absolutePath
+                File(reactApplicationContext.filesDir, "olineri_models").apply { mkdirs() }.absolutePath
             }
-            runtime = VaaniRuntime.initialize(storageDir)
+            runtime = OlineriRuntime.initialize(storageDir)
             promise.resolve(true)
         } catch (e: Exception) {
             promise.reject("INIT_ERROR", e.message, e)

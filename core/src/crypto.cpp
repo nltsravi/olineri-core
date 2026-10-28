@@ -1,4 +1,4 @@
-#include "vaani/internal/crypto.hpp"
+#include "olineri/internal/crypto.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -6,7 +6,7 @@
 #include <cstring>
 #include <array>
 
-namespace vaani {
+namespace olineri {
 namespace crypto {
 
 /* ========================================================================= */
@@ -686,4 +686,4 @@ bool ed25519_verify(
 }
 
 } // namespace crypto
-} // namespace vaani
+} // namespace olineri

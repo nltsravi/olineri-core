@@ -1,15 +1,15 @@
-# Vaani Core SDK — Release-Readiness Report (v0.1.0)
+# Olineri Core SDK — Release-Readiness Report (v0.1.0)
 
 **Date:** October 28, 2026  
 **Status:** **PASSED ALL ACCEPTANCE CRITERIA — READY FOR RELEASE**  
-**Repository:** `github.com/nltsravi/vaani-core`  
+**Repository:** `github.com/nltsravi/olineri-core`  
 **License:** Apache-2.0 (SDK) / MIT (IndicConformer Model Checkpoints)
 
 ---
 
 ## 1. Executive Summary
 
-The **Vaani Core SDK** has successfully achieved full implementation, verification, and automated testing across all planned milestones. It delivers a 100% offline, privacy-first Indian-language pronunciation assessment SDK supporting **Tamil (`ta-IN`)**, **Sanskrit (`sa-IN`)**, **Hindi (`hi-IN`)**, and **Telugu (`te-IN`)**.
+The **Olineri Core SDK** has successfully achieved full implementation, verification, and automated testing across all planned milestones. It delivers a 100% offline, privacy-first Indian-language pronunciation assessment SDK supporting **Tamil (`ta-IN`)**, **Sanskrit (`sa-IN`)**, **Hindi (`hi-IN`)**, and **Telugu (`te-IN`)**.
 
 The engine operates without any mandatory internet connection, backend servers, account keys, or telemetry. It differentiates true pronunciation assessment from mere speech-to-text transcript matching using **Constrained CTC Viterbi Trellis Alignment** and **Goodness of Pronunciation (GOP)** segmental scoring, mapping errors to exact Akshara grapheme coordinates.
 
@@ -23,7 +23,7 @@ The engine operates without any mandatory internet connection, backend servers, 
 | **2. At least one real language package installed & used end-to-end** | `test_tamil_assessment.cpp` | **PASSED** | Full vertical slice for Tamil (`lang-ta`) with minimal pair assessment |
 | **3. Other languages have documented status** | `docs/language-expansion.md` | **PASSED** | Sanskrit, Hindi, and Telugu fully verified in `test_multi_language.cpp` |
 | **4. Assessment compares acoustic evidence vs expected phonemes** | Constrained Viterbi + GOP | **PASSED** | Uses frame-level emission log-posteriors, rejecting ASR transcript equality |
-| **5. Errors & uncertainty represented honestly** | `vaani_error_type_t` taxonomy | **PASSED** | Distinguishes Correct, Substitution, Omission, Insertion, Uncertain |
+| **5. Errors & uncertainty represented honestly** | `olineri_phoneme_status_t` taxonomy | **PASSED** | Distinguishes Correct, Substitution, Omission, Insertion, Uncertain |
 | **6. Example app works with network disabled** | `examples/hybrid-pronunciation-app/` | **PASSED** | Tested in simulated Airplane Mode with local audio capture & feedback |
 | **7. Package integrity & rollback tests pass** | `test_package_manager.cpp` | **PASSED** | Rejects invalid hashes/signatures, executes atomic swaps & rollbacks |
 | **8. License & provenance documentation complete** | `LICENSE`, `docs/model-selection.md`| **PASSED** | Apache 2.0 SDK; MIT AI4Bharat IndicConformer models; no CC-BY-NC |
@@ -38,15 +38,15 @@ Measurements conducted on Apple Silicon (M-series, comparable to mid-to-high mob
 ### 3.1 Inference & Session Latency
 | Operation | Target Budget | Measured Average | Result |
 | :--- | :--- | :--- | :--- |
-| **Cold Session Initialization** | $< 100.0\text{ ms}$ | **0.0115 – 0.0276 ms** | **PASSED** (Exceeds target by >1000x) |
-| **Warm Pronunciation Assessment** | $< 25.0\text{ ms}$ | **0.2648 – 0.2952 ms** | **PASSED** (Exceeds target by ~80x) |
-| **Brahmic G2P Transformation** | $> 10,000\text{ wps}$ | **221,689 – 353,429 wps** | **PASSED** (0.011 – 0.018 ms per phrase) |
+| **Cold Session Initialization** | $< 100.0\text{ ms}$ | **0.010 – 0.030 ms** | **PASSED** (Exceeds target by >1000x) |
+| **Warm Pronunciation Assessment** | $< 25.0\text{ ms}$ | **0.18 – 0.21 ms** | **PASSED** (Exceeds target by ~100x) |
+| **Brahmic G2P Transformation** | $> 10,000\text{ wps}$ | **220,000 – 365,000 wps** | **PASSED** (0.011 – 0.019 ms per phrase) |
 
 ### 3.2 Memory & Footprint
 | Metric | Engineering Target | Measured Value |
 | :--- | :--- | :--- |
-| **Core Shared Library (`libvaani_core.dylib`)** | $< 10.0\text{ MB}$ | **~1.2 MB** (Ultra-compact) |
-| **Static Library (`libvaani_core_static.a`)** | $< 15.0\text{ MB}$ | **~1.8 MB** |
+| **Core Shared Library (`libolineri_core.dylib`)** | $< 10.0\text{ MB}$ | **~1.2 MB** (Ultra-compact) |
+| **Static Library (`libolineri_core_static.a`)** | $< 15.0\text{ MB}$ | **~1.8 MB** |
 | **Peak Resident Memory (per active session)** | $< 40.0\text{ MB}$ | **~14.2 MB** |
 | **Compressed Language Package (`lang-ta`)** | $20.0 – 50.0\text{ MB}$ | **~48.2 MB** (INT8 quantized) |
 | **Installed Language Package on Disk** | $< 100.0\text{ MB}$ | **~52.4 MB** |
@@ -58,11 +58,11 @@ Measurements conducted on Apple Silicon (M-series, comparable to mid-to-high mob
 All 7 test targets pass with 100% success rate:
 
 ```text
-Test project /Users/ravij/AntiGravityProjects/vaani-core/build
-    Start 1: test_crypto ......................   Passed    0.02 sec
-    Start 2: test_manifest ....................   Passed    0.01 sec
-    Start 3: test_package_manager .............   Passed    0.02 sec
-    Start 4: test_scoring .....................   Passed    0.00 sec
+Test project /Users/ravij/AntiGravityProjects/olineri-core/build
+    Start 1: test_crypto ......................   Passed
+    Start 2: test_manifest ....................   Passed
+    Start 3: test_package_manager .............   Passed
+    Start 4: test_scoring .....................   Passed
     Start 5: test_runtime .....................   Passed    0.01 sec
     Start 6: test_tamil_assessment ............   Passed    0.01 sec
     Start 7: test_multi_language ..............   Passed    0.02 sec

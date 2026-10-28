@@ -1,18 +1,18 @@
-#include "vaani/internal/scoring_engine.hpp"
+#include "olineri/internal/scoring_engine.hpp"
 #include <iostream>
 #include <cassert>
 
 void test_perfect_alignment_scoring() {
-    vaani::scoring::ScoringEngine scorer;
+    olineri::scoring::ScoringEngine scorer;
 
     // 2 target phonemes: token 1 and token 2
-    std::vector<vaani::scoring::PhonemeTarget> targets = {
+    std::vector<olineri::scoring::PhonemeTarget> targets = {
         {"/p/", 1, 0, 1, 0, 1},
         {"/a/", 2, 1, 2, 1, 1}
     };
 
     // 20 frames, vocab size 10, blank = 0
-    vaani::scoring::AcousticEmission emission;
+    olineri::scoring::AcousticEmission emission;
     emission.num_frames = 20;
     emission.vocab_size = 10;
     emission.blank_id = 0;
@@ -31,9 +31,9 @@ void test_perfect_alignment_scoring() {
 
     auto result = scorer.assess(targets, emission);
     assert(result.phonemes.size() == 2);
-    assert(result.phonemes[0].status == VAANI_PHONEME_CORRECT);
+    assert(result.phonemes[0].status == OLINERI_PHONEME_CORRECT);
     assert(result.phonemes[0].score >= 70.0f);
-    assert(result.phonemes[1].status == VAANI_PHONEME_CORRECT);
+    assert(result.phonemes[1].status == OLINERI_PHONEME_CORRECT);
     assert(result.phonemes[1].score >= 70.0f);
     assert(result.overall_score >= 70.0f);
 
@@ -41,14 +41,14 @@ void test_perfect_alignment_scoring() {
 }
 
 void test_substitution_detection() {
-    vaani::scoring::ScoringEngine scorer;
+    olineri::scoring::ScoringEngine scorer;
 
     // Target expects token 1 (/ɻ/ e.g. Tamil ழ)
-    std::vector<vaani::scoring::PhonemeTarget> targets = {
+    std::vector<olineri::scoring::PhonemeTarget> targets = {
         {"/ɻ/", 1, 0, 3, 0, 1}
     };
 
-    vaani::scoring::AcousticEmission emission;
+    olineri::scoring::AcousticEmission emission;
     emission.num_frames = 15;
     emission.vocab_size = 10;
     emission.blank_id = 0;
@@ -62,7 +62,7 @@ void test_substitution_detection() {
 
     auto result = scorer.assess(targets, emission);
     assert(result.phonemes.size() == 1);
-    assert(result.phonemes[0].status == VAANI_PHONEME_SUBSTITUTION);
+    assert(result.phonemes[0].status == OLINERI_PHONEME_SUBSTITUTION);
     assert(result.phonemes[0].score < 50.0f);
     assert(result.phonemes[0].detected_phoneme == "token_3");
 
@@ -71,15 +71,15 @@ void test_substitution_detection() {
 }
 
 void test_omission_detection() {
-    vaani::scoring::ScoringEngine scorer;
+    olineri::scoring::ScoringEngine scorer;
 
     // 2 target phonemes, second one receives zero audio frames (omitted)
-    std::vector<vaani::scoring::PhonemeTarget> targets = {
+    std::vector<olineri::scoring::PhonemeTarget> targets = {
         {"/k/", 1, 0, 1, 0, 1},
         {"/m/", 2, 1, 2, 1, 1}
     };
 
-    vaani::scoring::AcousticEmission emission;
+    olineri::scoring::AcousticEmission emission;
     emission.num_frames = 10;
     emission.vocab_size = 10;
     emission.blank_id = 0;
@@ -93,7 +93,7 @@ void test_omission_detection() {
     auto result = scorer.assess(targets, emission);
     assert(result.phonemes.size() == 2);
     // Token 2 was never aligned
-    assert(result.phonemes[1].status == VAANI_PHONEME_OMISSION);
+    assert(result.phonemes[1].status == OLINERI_PHONEME_OMISSION);
     assert(result.phonemes[1].score == 0.0f);
 
     std::cout << "[PASS] Phoneme omission / deletion detection" << std::endl;

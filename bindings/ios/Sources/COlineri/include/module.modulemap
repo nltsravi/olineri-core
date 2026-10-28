@@ -1,0 +1,4 @@
+module COlineri [system] {
+    header "olineri_c_api.h"
+    export *
+}

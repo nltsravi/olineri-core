@@ -1,6 +1,6 @@
 # Security Architecture & Threat Model
 
-This document specifies the security requirements, threat model, and defense-in-depth mitigations implemented in the SDK (`vaani-core`).
+This document specifies the security requirements, threat model, and defense-in-depth mitigations implemented in the SDK (`olineri-core`).
 
 ---
 
@@ -25,7 +25,7 @@ This document specifies the security requirements, threat model, and defense-in-
 Host App initiates package install:
   1. Download package archive (HTTPS with TLS 1.3 certificate pinning)
   2. Verify archive SHA-256 matches catalog entry
-  3. Extract to staging directory: <app_dir>/vaani/staging/<pkg_id>.<random_uuid>/
+  3. Extract to staging directory: <app_dir>/olineri/staging/<pkg_id>.<random_uuid>/
   4. Parse manifest.json:
      - Enforce schema validation
      - Check min SDK version <= current SDK version
@@ -45,5 +45,5 @@ Host App initiates package install:
 
 1. **No Persistence by Default:** Spoken audio is held strictly in volatile RAM during feature extraction and inference. The SDK never writes recorded audio to flash storage unless the host application explicitly configures a diagnostic debug mode.
 2. **Buffer Zeroization:** Once feature extraction completes, raw PCM buffers can be wiped (`memset_s`) to avoid memory retention.
-3. **No Cloud Telemetry:** No user IDs, device fingerprints, audio recordings, recognized text, or pronunciation scores are collected or transmitted by `vaani-core`.
+3. **No Cloud Telemetry:** No user IDs, device fingerprints, audio recordings, recognized text, or pronunciation scores are collected or transmitted by `olineri-core`.
 4. **Microphone Permissions:** The core library does not directly interact with OS permission prompts. Hybrid bindings request audio permissions only when the recording session is initiated, and audio capture stops immediately upon user release or timeout.

@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Milestone 4 expands `vaani-core` beyond the initial Tamil pilot to provide complete, production-quality linguistic support for:
+Milestone 4 expands `olineri-core` beyond the initial Tamil pilot to provide complete, production-quality linguistic support for:
 1. **Sanskrit (`sa-IN`)**
 2. **Hindi (`hi-IN`)**
 3. **Telugu (`te-IN`)**
@@ -41,7 +41,7 @@ Sanskrit is written in the Devanagari script (with Tamil Grantha/IAST transliter
 Hindi is also written in Devanagari, but its modern spoken phonology differs dramatically from Sanskrit:
 
 1. **Contextual Schwa Deletion Rule:**
-   - In modern Standard Hindi, the inherent vowel `/ə/` is not universally pronounced. `vaani-core` implements the 2-tier schwa deletion algorithm:
+   - In modern Standard Hindi, the inherent vowel `/ə/` is not universally pronounced. `olineri-core` implements the 2-tier schwa deletion algorithm:
      - **Word-Final Schwa Deletion:** In words of length $\ge 2$ aksharas, un-geminated final consonants drop the inherent `/ə/`:
        - **कमल** $\to$ `/k, ə, m, ə, l/` (not `[kəmələ]`).
        - **फल** $\to$ `/pʰ, ə, l/` (not `[pʰələ]`).
@@ -75,7 +75,7 @@ Telugu is written in the Telugu Brahmic script (`U+0C00`–`U+0C7F`). Key charac
 
 ## 2. Test Cases & Verification Matrix
 
-The test suite in [`core/tests/test_multi_language.cpp`](file:///Users/ravij/AntiGravityProjects/vaani-core/core/tests/test_multi_language.cpp) verifies all rules programmatically:
+The test suite in [`core/tests/test_multi_language.cpp`](file:///Users/ravij/AntiGravityProjects/olineri-core/core/tests/test_multi_language.cpp) verifies all rules programmatically:
 
 | Language | Test Word | Expected Phonemes | Phonological Rule Verified | Status |
 | :--- | :--- | :--- | :--- | :--- |
@@ -94,7 +94,7 @@ The test suite in [`core/tests/test_multi_language.cpp`](file:///Users/ravij/Ant
 
 ## 3. End-to-End Multilingual C ABI Assessment
 
-Three simultaneous sessions were created and executed sequentially using `vaani_c_api.h`:
+Three simultaneous sessions were created and executed sequentially using `olineri_c_api.h`:
 - `lang-sa` session assessed **नमः** (6 phonemes, score 84.5/100)
 - `lang-hi` session assessed **कमल** (5 phonemes, score 86.2/100)
 - `lang-te` session assessed **అమ్మ** (4 phonemes, score 88.0/100)

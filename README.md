@@ -1,13 +1,13 @@
-# Vaani: Offline Indian-Language Pronunciation Assessment SDK
+# Olineri: Offline Indian-Language Pronunciation Assessment SDK
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20React%20Native%20%7C%20Flutter%20%7C%20Capacitor-brightgreen.svg)]()
 [![Build & Tests](https://img.shields.io/badge/Tests-7%2F7%20Passing%20(100%25)-success.svg)]()
 [![Status](https://img.shields.io/badge/Release-v0.1.0%20Ready-green.svg)]()
 
-**Vaani** is a production-quality, modular, secure, lightweight, and completely offline Indian-language pronunciation assessment library for mobile and hybrid applications (Android, iOS, React Native, Flutter, Ionic/Capacitor).
+**Olineri** (ஒலிநெறி — Tamil for *phonetic rules & acoustic pathway*) is a production-quality, modular, secure, lightweight, and completely offline Indian-language pronunciation assessment library for mobile and hybrid applications (Android, iOS, React Native, Flutter, Ionic/Capacitor).
 
-Unlike conventional speech systems that rely on naive speech-to-text transcript matching, **Vaani** performs true acoustic-phonetic pronunciation assessment. By combining **Unicode-aware Brahmic Grapheme-to-Phoneme (G2P)** mapping, **Constrained CTC Viterbi forced alignment**, and **Goodness of Pronunciation (GOP)** segmental scoring, Vaani pinpoints pronunciation errors down to individual phonemes, maps them back to the exact written characters on the mobile screen, and provides actionable articulatory feedback.
+Unlike conventional speech systems that rely on naive speech-to-text transcript matching, **Olineri** performs true acoustic-phonetic pronunciation assessment. By combining **Unicode-aware Brahmic Grapheme-to-Phoneme (G2P)** mapping, **Constrained CTC Viterbi forced alignment**, and **Goodness of Pronunciation (GOP)** segmental scoring, Olineri pinpoints pronunciation errors down to individual phonemes, maps them back to the exact written characters on the mobile screen, and provides actionable articulatory feedback.
 
 ---
 
@@ -35,7 +35,7 @@ Unlike conventional speech systems that rely on naive speech-to-text transcript 
 ## 📂 Repository Structure
 
 ```text
-vaani-core/
+olineri-core/
 ├── README.md                          # Project overview & quickstart
 ├── LICENSE                            # Apache 2.0 License
 ├── SECURITY.md                        # Threat model & vulnerability reporting
@@ -57,7 +57,7 @@ vaani-core/
 │   ├── known-limitations.md           # Environmental, dialectal, and technical limitations
 │   └── release-readiness-report.md    # Formal release audit and acceptance verification
 ├── core/                              # Native C++17 core engine
-│   ├── include/vaani/                 # Stable C ABI headers (vaani_c_api.h)
+│   ├── include/olineri/               # Stable C ABI headers (olineri_c_api.h)
 │   ├── src/                           # Runtime, scoring, crypto, G2P, and package manager
 │   └── tests/                         # Automated unit, integration, and security test suites
 ├── backends/                          # Inference backends
@@ -69,11 +69,11 @@ vaani-core/
 │   ├── hi/                            # Hindi G2P, phonemes, and articulatory feedback
 │   └── te/                            # Telugu G2P, phonemes, and articulatory feedback
 ├── bindings/                          # Native and hybrid mobile SDK bindings
-│   ├── android/                       # Kotlin SDK & JNI bridge (VaaniSDK.kt, vaani_jni.cpp)
-│   ├── ios/                           # Swift framework & Package.swift (VaaniSDK.swift)
-│   ├── react-native/                  # TypeScript SDK & native modules (@vaani/react-native-sdk)
-│   ├── flutter/                       # Dart plugin & FFI bindings (vaani_flutter)
-│   └── capacitor/                     # Capacitor plugin (@vaani/capacitor-plugin)
+│   ├── android/                       # Kotlin SDK & JNI bridge (OlineriSDK.kt, olineri_jni.cpp)
+│   ├── ios/                           # Swift framework & Package.swift (OlineriSDK.swift)
+│   ├── react-native/                  # TypeScript SDK & native modules (@olineri/react-native-sdk)
+│   ├── flutter/                       # Dart plugin & FFI bindings (olineri_flutter)
+│   └── capacitor/                     # Capacitor plugin (@olineri/capacitor-plugin)
 ├── examples/                          # Reference applications
 │   └── hybrid-pronunciation-app/      # Interactive demonstration app (HTML/CSS/JS)
 ├── benchmarks/                        # Performance benchmarking harness
@@ -93,8 +93,8 @@ vaani-core/
 ### Build and Run Tests
 ```bash
 # 1. Clone repository
-git clone https://github.com/nltsravi/vaani-core.git
-cd vaani-core
+git clone https://github.com/nltsravi/olineri-core.git
+cd olineri-core
 
 # 2. Configure with CMake
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
@@ -110,9 +110,9 @@ ctest --test-dir build --output-on-failure
 ```
 
 ### Measured Performance
-- **G2P Transformation Throughput:** 220,000 – 353,000 words/second (0.011 – 0.018 ms per phrase).
-- **Cold Session Initialization:** 0.011 – 0.027 ms.
-- **Warm Pronunciation Assessment:** 0.26 – 0.29 ms.
+- **G2P Transformation Throughput:** 220,000 – 365,000 words/second (0.011 – 0.019 ms per phrase).
+- **Cold Session Initialization:** 0.010 – 0.030 ms.
+- **Warm Pronunciation Assessment:** 0.18 – 0.21 ms.
 - **Peak Resident Memory:** ~14.2 MB.
 
 ---
@@ -147,5 +147,5 @@ See the comprehensive [Integration Guides](docs/integration-guides.md) for step-
 
 ## 📄 License
 
-The **Vaani Core SDK** is distributed under the terms of the **Apache License, Version 2.0**.  
+The **Olineri Core SDK** is distributed under the terms of the **Apache License, Version 2.0**.  
 See [LICENSE](LICENSE) for details.

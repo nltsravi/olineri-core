@@ -1,25 +1,25 @@
-#ifndef VAANI_INTERNAL_INFERENCE_ENGINE_HPP
-#define VAANI_INTERNAL_INFERENCE_ENGINE_HPP
+#ifndef OLINERI_INTERNAL_INFERENCE_ENGINE_HPP
+#define OLINERI_INTERNAL_INFERENCE_ENGINE_HPP
 
 #include <string>
 #include <vector>
 #include <memory>
-#include "vaani/vaani_c_api.h"
-#include "vaani/internal/scoring_engine.hpp"
+#include "olineri/olineri_c_api.h"
+#include "olineri/internal/scoring_engine.hpp"
 
-namespace vaani {
+namespace olineri {
 namespace inference {
 
 class InferenceEngine {
 public:
     virtual ~InferenceEngine() = default;
 
-    virtual vaani_status_t load_model(
+    virtual olineri_status_t load_model(
         const std::string& package_dir,
         const std::string& model_id
     ) = 0;
 
-    virtual vaani_status_t infer(
+    virtual olineri_status_t infer(
         const float* audio_samples,
         uint32_t sample_count,
         uint32_t sample_rate,
@@ -31,6 +31,6 @@ public:
 };
 
 } // namespace inference
-} // namespace vaani
+} // namespace olineri
 
-#endif // VAANI_INTERNAL_INFERENCE_ENGINE_HPP
+#endif // OLINERI_INTERNAL_INFERENCE_ENGINE_HPP

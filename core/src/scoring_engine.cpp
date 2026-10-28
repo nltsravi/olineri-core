@@ -1,9 +1,9 @@
-#include "vaani/internal/scoring_engine.hpp"
+#include "olineri/internal/scoring_engine.hpp"
 #include <cmath>
 #include <algorithm>
 #include <limits>
 
-namespace vaani {
+namespace olineri {
 namespace scoring {
 
 ScoringEngine::ScoringEngine(float beta, float theta, float pass_threshold)
@@ -36,7 +36,7 @@ AssessmentOutput ScoringEngine::assess(
             PhonemeResult res;
             res.expected_phoneme = tgt.ipa;
             res.score = 0.0f;
-            res.status = VAANI_PHONEME_UNCERTAIN;
+            res.status = OLINERI_PHONEME_UNCERTAIN;
             res.char_start_utf8 = tgt.char_start_utf8;
             res.char_end_utf8 = tgt.char_end_utf8;
             res.cluster_index = tgt.cluster_index;
@@ -148,7 +148,7 @@ AssessmentOutput ScoringEngine::assess(
         if (ts == -1 || te == -1 || te < ts) {
             // Omission: target received zero aligned frames
             res.score = 0.0f;
-            res.status = VAANI_PHONEME_OMISSION;
+            res.status = OLINERI_PHONEME_OMISSION;
             res.start_time_ms = 0.0f;
             res.end_time_ms = 0.0f;
             res.feedback_instruction = "Sound was omitted or inaudible.";
@@ -180,13 +180,13 @@ AssessmentOutput ScoringEngine::assess(
             res.score = calibrate_score(avg_lpr);
 
             if (res.score >= pass_threshold_) {
-                res.status = VAANI_PHONEME_CORRECT;
+                res.status = OLINERI_PHONEME_CORRECT;
                 res.detected_phoneme = tgt.ipa;
             } else {
                 // Check if target was omitted (insufficient acoustic duration or below noise floor)
                 float mean_target_prob = competitor_mass[tgt.token_id] / static_cast<float>(duration);
                 if (duration <= 1 || (duration <= 2 && mean_target_prob < -3.0f)) {
-                    res.status = VAANI_PHONEME_OMISSION;
+                    res.status = OLINERI_PHONEME_OMISSION;
                     res.score = 0.0f;
                     res.feedback_instruction = "Sound was omitted or inaudible.";
                 } else {
@@ -202,11 +202,11 @@ AssessmentOutput ScoringEngine::assess(
                     }
 
                     if (best_alt != tgt.token_id && best_alt_val > competitor_mass[tgt.token_id]) {
-                        res.status = VAANI_PHONEME_SUBSTITUTION;
+                        res.status = OLINERI_PHONEME_SUBSTITUTION;
                         res.detected_phoneme = "token_" + std::to_string(best_alt);
                         res.feedback_instruction = "Articulatory placement substituted with alternative sound.";
                     } else {
-                        res.status = VAANI_PHONEME_UNCERTAIN;
+                        res.status = OLINERI_PHONEME_UNCERTAIN;
                         res.feedback_instruction = "Sound articulation was unclear or low confidence.";
                     }
                 }
@@ -223,4 +223,4 @@ AssessmentOutput ScoringEngine::assess(
 }
 
 } // namespace scoring
-} // namespace vaani
+} // namespace olineri

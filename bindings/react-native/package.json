@@ -1,5 +1,5 @@
 {
-  "name": "@vaani/react-native-sdk",
+  "name": "@olineri/react-native-sdk",
   "version": "0.1.0",
   "description": "Offline Indian-Language Pronunciation Assessment SDK for React Native",
   "main": "dist/index.js",
@@ -17,7 +17,7 @@
     "hindi",
     "telugu"
   ],
-  "author": "Vaani Core Team",
+  "author": "Olineri Core Team",
   "license": "Apache-2.0",
   "peerDependencies": {
     "react": "*",

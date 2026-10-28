@@ -1,12 +1,12 @@
-#ifndef VAANI_INTERNAL_MANIFEST_HPP
-#define VAANI_INTERNAL_MANIFEST_HPP
+#ifndef OLINERI_INTERNAL_MANIFEST_HPP
+#define OLINERI_INTERNAL_MANIFEST_HPP
 
 #include <string>
 #include <vector>
 #include <cstdint>
-#include "vaani/vaani_c_api.h"
+#include "olineri/olineri_c_api.h"
 
-namespace vaani {
+namespace olineri {
 namespace manifest {
 
 struct ArtifactEntry {
@@ -58,12 +58,12 @@ struct PackageManifest {
 /**
  * @brief Parses JSON string into a PackageManifest struct.
  */
-vaani_status_t parse_manifest(const std::string& json_text, PackageManifest& out_manifest);
+olineri_status_t parse_manifest(const std::string& json_text, PackageManifest& out_manifest);
 
 /**
  * @brief Validates manifest compliance against current SDK version and schema requirements.
  */
-vaani_status_t validate_manifest(const PackageManifest& manifest, const std::string& current_sdk_version);
+olineri_status_t validate_manifest(const PackageManifest& manifest, const std::string& current_sdk_version);
 
 /**
  * @brief Checks if version string 'required' is <= 'current'.
@@ -71,6 +71,6 @@ vaani_status_t validate_manifest(const PackageManifest& manifest, const std::str
 bool is_version_compatible(const std::string& required, const std::string& current);
 
 } // namespace manifest
-} // namespace vaani
+} // namespace olineri
 
-#endif // VAANI_INTERNAL_MANIFEST_HPP
+#endif // OLINERI_INTERNAL_MANIFEST_HPP

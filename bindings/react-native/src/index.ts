@@ -8,38 +8,38 @@ import {
   SDKFeature,
 } from "./types";
 
-const { VaaniNativeBridge } = NativeModules;
+const { OlineriNativeBridge } = NativeModules;
 
 export class LanguageManager {
   async listInstalled(): Promise<InstalledLanguageInfo[]> {
-    if (!VaaniNativeBridge) {
-      throw new Error("VaaniNativeBridge is not linked in this environment.");
+    if (!OlineriNativeBridge) {
+      throw new Error("OlineriNativeBridge is not linked in this environment.");
     }
-    return await VaaniNativeBridge.listInstalledLanguages();
+    return await OlineriNativeBridge.listInstalledLanguages();
   }
 
   async install(
     languageTag: string,
     options: PackageInstallOptions
   ): Promise<string> {
-    if (!VaaniNativeBridge) {
-      throw new Error("VaaniNativeBridge is not linked in this environment.");
+    if (!OlineriNativeBridge) {
+      throw new Error("OlineriNativeBridge is not linked in this environment.");
     }
-    return await VaaniNativeBridge.installPackage(languageTag, options);
+    return await OlineriNativeBridge.installPackage(languageTag, options);
   }
 
   async uninstall(packageId: string): Promise<boolean> {
-    if (!VaaniNativeBridge) {
-      throw new Error("VaaniNativeBridge is not linked in this environment.");
+    if (!OlineriNativeBridge) {
+      throw new Error("OlineriNativeBridge is not linked in this environment.");
     }
-    return await VaaniNativeBridge.uninstallPackage(packageId);
+    return await OlineriNativeBridge.uninstallPackage(packageId);
   }
 
   async getCapabilities(languageTag: string): Promise<SDKFeature[]> {
-    if (!VaaniNativeBridge) {
-      throw new Error("VaaniNativeBridge is not linked in this environment.");
+    if (!OlineriNativeBridge) {
+      throw new Error("OlineriNativeBridge is not linked in this environment.");
     }
-    return await VaaniNativeBridge.getPackageCapabilities(languageTag);
+    return await OlineriNativeBridge.getPackageCapabilities(languageTag);
   }
 }
 
@@ -51,11 +51,11 @@ export class PronunciationSDK {
   }
 
   static async initialize(config: SDKInitConfig = {}): Promise<PronunciationSDK> {
-    if (!VaaniNativeBridge) {
+    if (!OlineriNativeBridge) {
       // In web or mock testing environment, provide safe mock fallback
-      console.warn("VaaniNativeBridge not available. Running in mock/headless mode.");
+      console.warn("OlineriNativeBridge not available. Running in mock/headless mode.");
     } else {
-      await VaaniNativeBridge.initializeRuntime(config);
+      await OlineriNativeBridge.initializeRuntime(config);
     }
     return new PronunciationSDK();
   }
@@ -63,18 +63,19 @@ export class PronunciationSDK {
   async assessPronunciation(
     request: AssessmentRequest
   ): Promise<AssessmentResult> {
-    if (!VaaniNativeBridge) {
-      throw new Error("Vaani native speech engine is not accessible on this device.");
+    if (!OlineriNativeBridge) {
+      throw new Error("Olineri native speech engine is not accessible on this device.");
     }
-    return await VaaniNativeBridge.assessPronunciation(request);
+    return await OlineriNativeBridge.assessPronunciation(request);
   }
 
   async release(): Promise<void> {
-    if (VaaniNativeBridge) {
-      await VaaniNativeBridge.shutdownRuntime();
+    if (OlineriNativeBridge) {
+      await OlineriNativeBridge.shutdownRuntime();
     }
   }
 }
 
+export const OlineriSDK = PronunciationSDK;
 export * from "./types";
 export default PronunciationSDK;

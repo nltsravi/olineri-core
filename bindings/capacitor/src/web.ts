@@ -1,14 +1,14 @@
 import { WebPlugin } from '@capacitor/core';
-import type { VaaniCapacitorPlugin } from './definitions';
+import type { OlineriCapacitorPlugin } from './definitions';
 
-export class VaaniWeb extends WebPlugin implements VaaniCapacitorPlugin {
+export class OlineriWeb extends WebPlugin implements OlineriCapacitorPlugin {
   async initializeRuntime(_options: { storageDirectory?: string }): Promise<{ success: boolean }> {
-    console.log('[VaaniWeb] Runtime initialized in Web/WASM simulation mode');
+    console.log('[OlineriWeb] Runtime initialized in Web/WASM simulation mode');
     return { success: true };
   }
 
   async installPackage(options: { packagePath: string }): Promise<{ packageId: string }> {
-    console.log(`[VaaniWeb] Package registered: ${options.packagePath}`);
+    console.log(`[OlineriWeb] Package registered: ${options.packagePath}`);
     return { packageId: 'lang-mock' };
   }
 

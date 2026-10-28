@@ -1,6 +1,6 @@
-# Contributing to Vaani
+# Contributing to Olineri
 
-Thank you for your interest in contributing to **Vaani**, the offline Indian-language pronunciation assessment SDK.
+Thank you for your interest in contributing to **Olineri**, the offline Indian-language pronunciation assessment SDK.
 
 ---
 

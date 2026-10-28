@@ -2,15 +2,15 @@
 #include <cmath>
 #include <algorithm>
 
-namespace vaani {
+namespace olineri {
 namespace backends {
 
 MockEngine::MockEngine(uint32_t vocab_size, uint32_t blank_id)
     : vocab_size_(vocab_size), blank_id_(blank_id) {}
 
-vaani_status_t MockEngine::load_model(const std::string& /*package_dir*/, const std::string& /*model_id*/) {
+olineri_status_t MockEngine::load_model(const std::string& /*package_dir*/, const std::string& /*model_id*/) {
     loaded_ = true;
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
 void MockEngine::unload() {
@@ -33,79 +33,61 @@ void MockEngine::set_substitution(uint32_t expected_token, uint32_t competitor_t
     substitutions_[expected_token] = competitor_token;
 }
 
-vaani_status_t MockEngine::infer(
+olineri_status_t MockEngine::infer(
     const float* audio_samples,
     uint32_t sample_count,
     uint32_t sample_rate,
     scoring::AcousticEmission& out_emission
 ) {
     if (!audio_samples || sample_count == 0 || sample_rate == 0) {
-        return VAANI_ERR_AUDIO_INVALID;
+        return OLINERI_ERR_AUDIO_INVALID;
     }
 
-    // Audio health checks
-    float sum_sq = 0.0f;
-    uint32_t clipped_count = 0;
-
-    for (uint32_t i = 0; i < sample_count; ++i) {
-        float val = audio_samples[i];
-        if (std::isnan(val) || std::isinf(val)) {
-            return VAANI_ERR_AUDIO_INVALID;
-        }
-        if (val > 1.0f || val < -1.0f) {
-            clipped_count++;
-        }
-        sum_sq += val * val;
-    }
-
-    if (clipped_count > sample_count / 100) {
-        return VAANI_ERR_AUDIO_CLIPPED;
-    }
-
-    float rms = std::sqrt(sum_sq / static_cast<float>(sample_count));
-    if (rms < 0.001f) {
-        return VAANI_ERR_AUDIO_TOO_QUIET;
-    }
-
-    // Compute frames (10 ms shift at 16000 Hz = 160 samples/frame)
-    uint32_t num_frames = std::max(sample_count / 160, 20u);
+    // Target frame length (20 ms window, 10 ms stride -> approx sample_count / 160)
+    uint32_t num_frames = sample_count / 160;
+    if (num_frames == 0) num_frames = 1;
 
     out_emission.num_frames = num_frames;
     out_emission.vocab_size = vocab_size_;
     out_emission.blank_id = blank_id_;
-    out_emission.data.assign(num_frames * vocab_size_, -5.0f); // background log prob
+    out_emission.data.assign(num_frames * vocab_size_, -5.0f); // Default background noise floor
+
+    // If no explicit tokens set, synthesize dummy emissions with blank dominant
+    if (sequence_to_emit_.empty()) {
+        for (uint32_t t = 0; t < num_frames; ++t) {
+            out_emission.data[t * vocab_size_ + blank_id_] = -0.1f;
+        }
+        return OLINERI_OK;
+    }
 
     if (scenario_ == MockScenario::LOW_CONFIDENCE_NOISE) {
+        // Uniform ambiguous distribution
         float uniform_log_prob = -std::log(static_cast<float>(vocab_size_));
         std::fill(out_emission.data.begin(), out_emission.data.end(), uniform_log_prob);
-        return VAANI_OK;
+        return OLINERI_OK;
     }
 
-    if (sequence_to_emit_.empty()) {
-        // Fallback: emit blanks
-        for (uint32_t t = 0; t < num_frames; ++t) {
-            out_emission.data[t * vocab_size_ + blank_id_] = 0.0f;
-        }
-        return VAANI_OK;
-    }
-
-    // Distribute emitted tokens across frames
-    size_t num_tokens = sequence_to_emit_.size();
-    uint32_t frames_per_token = num_frames / static_cast<uint32_t>(num_tokens);
+    // Partition frames evenly across phonemes with blank transitions
+    uint32_t N = static_cast<uint32_t>(sequence_to_emit_.size());
+    uint32_t frames_per_token = num_frames / (N + 1);
     if (frames_per_token == 0) frames_per_token = 1;
 
-    for (size_t i = 0; i < num_tokens; ++i) {
-        uint32_t target_tok = sequence_to_emit_[i];
-        uint32_t start_f = static_cast<uint32_t>(i) * frames_per_token;
-        uint32_t end_f = std::min(start_f + frames_per_token, num_frames);
+    // Initial blank frames
+    for (uint32_t t = 0; t < frames_per_token && t < num_frames; ++t) {
+        out_emission.data[t * vocab_size_ + blank_id_] = -0.1f;
+    }
 
+    for (uint32_t i = 0; i < N; ++i) {
+        uint32_t target_tok = sequence_to_emit_[i];
         uint32_t tok_to_emit = target_tok;
-        if (scenario_ == MockScenario::SUBSTITUTE_SPECIFIC_TOKEN) {
-            auto it = substitutions_.find(target_tok);
-            if (it != substitutions_.end()) {
-                tok_to_emit = it->second;
-            }
+
+        // Apply substitution scenario if configured
+        if (scenario_ == MockScenario::SUBSTITUTE_SPECIFIC_TOKEN && substitutions_.count(target_tok) > 0) {
+            tok_to_emit = substitutions_[target_tok];
         }
+
+        uint32_t start_f = (i + 1) * frames_per_token;
+        uint32_t end_f = std::min(num_frames, (i + 2) * frames_per_token);
 
         bool is_omitted = (scenario_ == MockScenario::OMIT_SPECIFIC_TOKEN && substitutions_.count(target_tok) > 0);
 
@@ -122,8 +104,8 @@ vaani_status_t MockEngine::infer(
         }
     }
 
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
 } // namespace backends
-} // namespace vaani
+} // namespace olineri

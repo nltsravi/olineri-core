@@ -1,4 +1,4 @@
-export interface VaaniCapacitorPlugin {
+export interface OlineriCapacitorPlugin {
   initializeRuntime(options: { storageDirectory?: string }): Promise<{ success: boolean }>;
   installPackage(options: { packagePath: string }): Promise<{ packageId: string }>;
   uninstallPackage(options: { packageId: string }): Promise<{ success: boolean }>;

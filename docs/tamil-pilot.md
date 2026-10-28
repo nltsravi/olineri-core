@@ -1,6 +1,6 @@
 # Tamil Pilot Implementation & Empirical Report (`lang-ta`)
 
-This document records the empirical results, linguistic validation, and performance benchmarks for the **Tamil (`ta-IN`)** vertical slice implementation in `vaani-core`.
+This document records the empirical results, linguistic validation, and performance benchmarks for the **Tamil (`ta-IN`)** vertical slice implementation in `olineri-core`.
 
 ---
 
@@ -22,7 +22,7 @@ Tamil presents the most rigorous phonetic discrimination test among Indian langu
 
 ## 2. G2P & Akshara Coordinate Mapping
 
-The Brahmic G2P engine (`vaani::g2p::BrahmicG2P`) transforms Tamil Unicode text into canonical phoneme targets with explicit UTF-8 byte spans:
+The Brahmic G2P engine (`olineri::g2p::BrahmicG2P`) transforms Tamil Unicode text into canonical phoneme targets with explicit UTF-8 byte spans:
 
 ```text
 Input text: "பழம்" (fruit)
@@ -61,4 +61,4 @@ Measurements captured on a development machine running the compiled native binar
    * *Mitigation:* The pilot G2P maps standard formal orthography. In Milestone 4, a colloquial lexicon override table (`lexicon_overrides.json`) is introduced to accept documented colloquial variants.
 2. **High Ambient Acoustic Noise:**
    * If background SNR drops below $12\text{ dB}$, high-frequency retroflex formant transitions can be masked.
-   * *Mitigation:* The engine returns `VAANI_PHONEME_UNCERTAIN` instead of penalizing the user with a false failure.
+   * *Mitigation:* The engine returns `OLINERI_PHONEME_UNCERTAIN` instead of penalizing the user with a false failure.

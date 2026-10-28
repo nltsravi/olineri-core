@@ -12,10 +12,10 @@ Security updates and patches are provided for the current active release line:
 
 ## 2. Reporting a Vulnerability
 
-We take the security of `vaani-core` seriously. If you discover a security vulnerability, please report it responsibly:
+We take the security of `olineri-core` seriously. If you discover a security vulnerability, please report it responsibly:
 
 * **DO NOT** file a public GitHub issue for security vulnerabilities.
-* Send an email with full reproduction steps to: `security@vaani.dev` (or the maintainer's contact specified on GitHub).
+* Send an email with full reproduction steps to: `security@olineri.dev` (or the maintainer's contact specified on GitHub).
 * Include:
   * Description of the vulnerability (e.g. buffer overflow, zip-slip path traversal, signature bypass).
   * Proof-of-concept (PoC) archive or input sample.

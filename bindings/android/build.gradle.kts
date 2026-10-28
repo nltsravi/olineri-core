@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.vaani.core"
+    namespace = "com.olineri.core"
     compileSdk = 34
 
     defaultConfig {

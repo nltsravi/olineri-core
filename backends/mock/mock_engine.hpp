@@ -1,10 +1,10 @@
-#ifndef VAANI_BACKENDS_MOCK_ENGINE_HPP
-#define VAANI_BACKENDS_MOCK_ENGINE_HPP
+#ifndef OLINERI_BACKENDS_MOCK_ENGINE_HPP
+#define OLINERI_BACKENDS_MOCK_ENGINE_HPP
 
-#include "vaani/internal/inference_engine.hpp"
+#include "olineri/internal/inference_engine.hpp"
 #include <map>
 
-namespace vaani {
+namespace olineri {
 namespace backends {
 
 enum class MockScenario {
@@ -19,8 +19,8 @@ public:
     explicit MockEngine(uint32_t vocab_size = 64, uint32_t blank_id = 0);
     ~MockEngine() override = default;
 
-    vaani_status_t load_model(const std::string& package_dir, const std::string& model_id) override;
-    vaani_status_t infer(
+    olineri_status_t load_model(const std::string& package_dir, const std::string& model_id) override;
+    olineri_status_t infer(
         const float* audio_samples,
         uint32_t sample_count,
         uint32_t sample_rate,
@@ -44,6 +44,6 @@ private:
 };
 
 } // namespace backends
-} // namespace vaani
+} // namespace olineri
 
-#endif // VAANI_BACKENDS_MOCK_ENGINE_HPP
+#endif // OLINERI_BACKENDS_MOCK_ENGINE_HPP

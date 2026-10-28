@@ -1,5 +1,5 @@
-#ifndef VAANI_INTERNAL_JSON_HPP
-#define VAANI_INTERNAL_JSON_HPP
+#ifndef OLINERI_INTERNAL_JSON_HPP
+#define OLINERI_INTERNAL_JSON_HPP
 
 #include <string>
 #include <vector>
@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <cstdint>
 
-namespace vaani {
+namespace olineri {
 namespace json {
 
 enum class JsonType {
@@ -271,6 +271,6 @@ inline JsonValue parse(const std::string& json_text) {
 }
 
 } // namespace json
-} // namespace vaani
+} // namespace olineri
 
-#endif // VAANI_INTERNAL_JSON_HPP
+#endif // OLINERI_INTERNAL_JSON_HPP

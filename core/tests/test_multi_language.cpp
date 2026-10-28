@@ -1,7 +1,7 @@
-#include "vaani/vaani_c_api.h"
-#include "vaani/internal/g2p.hpp"
-#include "vaani/internal/filesystem.hpp"
-#include "vaani/internal/crypto.hpp"
+#include "olineri/olineri_c_api.h"
+#include "olineri/internal/g2p.hpp"
+#include "olineri/internal/filesystem.hpp"
+#include "olineri/internal/crypto.hpp"
 #include "backends/mock/mock_engine.hpp"
 
 #include <iostream>
@@ -9,10 +9,10 @@
 #include <cmath>
 #include <cassert>
 
-static const std::string TEST_SANDBOX = "/tmp/vaani_test_multi_language";
+static const std::string TEST_SANDBOX = "/tmp/olineri_test_multi_language";
 
 void test_sanskrit_g2p() {
-    vaani::g2p::BrahmicG2P g2p({"sa-IN", true, true});
+    olineri::g2p::BrahmicG2P g2p({"sa-IN", true, true});
 
     // Case 1: "नमः" - Visarga echoes preceding inherent vowel /ɐ/
     auto targets1 = g2p.convert("नमः");
@@ -59,7 +59,7 @@ void test_sanskrit_g2p() {
 }
 
 void test_hindi_g2p() {
-    vaani::g2p::BrahmicG2P g2p({"hi-IN", true, true});
+    olineri::g2p::BrahmicG2P g2p({"hi-IN", true, true});
 
     // Case 1: "कमल" - Word-final schwa deletion: /k/, /ə/, /m/, /ə/, /l/
     auto targets1 = g2p.convert("कमल");
@@ -103,7 +103,7 @@ void test_hindi_g2p() {
 }
 
 void test_telugu_g2p() {
-    vaani::g2p::BrahmicG2P g2p({"te-IN", true, true});
+    olineri::g2p::BrahmicG2P g2p({"te-IN", true, true});
 
     // Case 1: "అమ్మ" - Geminate bilabial nasal: /ɐ/, /m/, /m/, /ɐ/
     auto targets1 = g2p.convert("అమ్మ");
@@ -143,12 +143,12 @@ void test_telugu_g2p() {
 
 static std::string create_test_package(const std::string& pkg_id, const std::string& lang_tag, const std::string& script) {
     std::string pkg_dir = TEST_SANDBOX + "/" + pkg_id;
-    vaani::fs::create_directories(pkg_dir + "/model");
+    olineri::fs::create_directories(pkg_dir + "/model");
 
     std::string dummy_onnx = "dummy_conformer_ctc_" + lang_tag + "_weights";
     std::string model_file = pkg_dir + "/model/acoustic_model.onnx";
-    vaani::fs::write_string_to_file(model_file, dummy_onnx);
-    std::string sha = vaani::crypto::sha256_file(model_file);
+    olineri::fs::write_string_to_file(model_file, dummy_onnx);
+    std::string sha = olineri::crypto::sha256_file(model_file);
 
     std::string manifest_json = R"RAW({
       "schemaVersion": "1.0.0",
@@ -158,7 +158,7 @@ static std::string create_test_package(const std::string& pkg_id, const std::str
       "version": "1.0.0",
       "minSdkVersion": "0.1.0",
       "displayName": ")RAW" + pkg_id + R"RAW(",
-      "publisher": { "name": "Vaani Core Team", "publicKeyId": "vaani-prod-key" },
+      "publisher": { "name": "Olineri Core Team", "publicKeyId": "olineri-prod-key" },
       "capabilities": ["speechRecognition", "pronunciationAssessment", "phonemeFeedback", "characterMapping"],
       "model": {
         "id": "indicconformer-ctc-)RAW" + lang_tag + R"RAW(-int8",
@@ -179,18 +179,18 @@ static std::string create_test_package(const std::string& pkg_id, const std::str
       "installedSizeBytes": )RAW" + std::to_string(dummy_onnx.size() * 2) + R"RAW(
     })RAW";
 
-    vaani::fs::write_string_to_file(pkg_dir + "/manifest.json", manifest_json);
+    olineri::fs::write_string_to_file(pkg_dir + "/manifest.json", manifest_json);
     return pkg_dir;
 }
 
 void test_multilingual_assessment_sessions() {
-    vaani::fs::remove_all(TEST_SANDBOX);
-    vaani::fs::create_directories(TEST_SANDBOX);
+    olineri::fs::remove_all(TEST_SANDBOX);
+    olineri::fs::create_directories(TEST_SANDBOX);
     std::string storage_dir = TEST_SANDBOX + "/storage";
 
     // Initialize runtime
-    vaani_runtime_handle_t runtime = nullptr;
-    assert(vaani_runtime_create(storage_dir.c_str(), &runtime) == VAANI_OK);
+    olineri_runtime_handle_t runtime = nullptr;
+    assert(olineri_runtime_create(storage_dir.c_str(), &runtime) == OLINERI_OK);
 
     // Install Sanskrit, Hindi, Telugu packages
     std::string sa_pkg = create_test_package("lang-sa", "sa-IN", "Deva");
@@ -198,9 +198,9 @@ void test_multilingual_assessment_sessions() {
     std::string te_pkg = create_test_package("lang-te", "te-IN", "Telu");
 
     char out_id[64] = {0};
-    assert(vaani_package_install(runtime, sa_pkg.c_str(), out_id, sizeof(out_id)) == VAANI_OK);
-    assert(vaani_package_install(runtime, hi_pkg.c_str(), out_id, sizeof(out_id)) == VAANI_OK);
-    assert(vaani_package_install(runtime, te_pkg.c_str(), out_id, sizeof(out_id)) == VAANI_OK);
+    assert(olineri_package_install(runtime, sa_pkg.c_str(), out_id, sizeof(out_id)) == OLINERI_OK);
+    assert(olineri_package_install(runtime, hi_pkg.c_str(), out_id, sizeof(out_id)) == OLINERI_OK);
+    assert(olineri_package_install(runtime, te_pkg.c_str(), out_id, sizeof(out_id)) == OLINERI_OK);
 
     std::vector<float> audio(16000, 0.1f);
     for (size_t i = 0; i < audio.size(); ++i) {
@@ -209,71 +209,71 @@ void test_multilingual_assessment_sessions() {
 
     // 1. Sanskrit Assessment Session: "नमः"
     {
-        vaani_session_handle_t sa_session = nullptr;
-        assert(vaani_session_create(runtime, "sa-IN", &sa_session) == VAANI_OK);
+        olineri_session_handle_t sa_session = nullptr;
+        assert(olineri_session_create(runtime, "sa-IN", &sa_session) == OLINERI_OK);
 
-        vaani_result_handle_t result = nullptr;
-        assert(vaani_assess_pronunciation(sa_session, "नमः", audio.data(), audio.size(), 16000, &result) == VAANI_OK);
+        olineri_result_handle_t result = nullptr;
+        assert(olineri_assess_pronunciation(sa_session, "नमः", audio.data(), audio.size(), 16000, &result) == OLINERI_OK);
         assert(result != nullptr);
-        assert(vaani_result_get_phoneme_count(result) == 6); // /n̪/, /ɐ/, /m/, /ɐ/, /h/, /ɐ/
-        assert(vaani_result_get_overall_score(result) >= 70.0f);
+        assert(olineri_result_get_phoneme_count(result) == 6); // /n̪/, /ɐ/, /m/, /ɐ/, /h/, /ɐ/
+        assert(olineri_result_get_overall_score(result) >= 70.0f);
 
-        vaani_phoneme_feedback_t fb;
-        assert(vaani_result_get_phoneme_feedback(result, 4, &fb) == VAANI_OK);
+        olineri_phoneme_feedback_t fb;
+        assert(olineri_result_get_phoneme_feedback(result, 4, &fb) == OLINERI_OK);
         assert(std::string(fb.expected_phoneme) == "/h/");
-        assert(fb.status == VAANI_PHONEME_CORRECT);
+        assert(fb.status == OLINERI_PHONEME_CORRECT);
 
-        vaani_result_destroy(result);
-        vaani_session_destroy(sa_session);
+        olineri_result_destroy(result);
+        olineri_session_destroy(sa_session);
     }
 
     // 2. Hindi Assessment Session: "कमल"
     {
-        vaani_session_handle_t hi_session = nullptr;
-        assert(vaani_session_create(runtime, "hi-IN", &hi_session) == VAANI_OK);
+        olineri_session_handle_t hi_session = nullptr;
+        assert(olineri_session_create(runtime, "hi-IN", &hi_session) == OLINERI_OK);
 
-        vaani_result_handle_t result = nullptr;
-        assert(vaani_assess_pronunciation(hi_session, "कमल", audio.data(), audio.size(), 16000, &result) == VAANI_OK);
+        olineri_result_handle_t result = nullptr;
+        assert(olineri_assess_pronunciation(hi_session, "कमल", audio.data(), audio.size(), 16000, &result) == OLINERI_OK);
         assert(result != nullptr);
-        assert(vaani_result_get_phoneme_count(result) == 5); // /k/, /ə/, /m/, /ə/, /l/ (schwa deleted!)
-        assert(vaani_result_get_overall_score(result) >= 70.0f);
+        assert(olineri_result_get_phoneme_count(result) == 5); // /k/, /ə/, /m/, /ə/, /l/ (schwa deleted!)
+        assert(olineri_result_get_overall_score(result) >= 70.0f);
 
-        vaani_phoneme_feedback_t fb;
-        assert(vaani_result_get_phoneme_feedback(result, 4, &fb) == VAANI_OK);
+        olineri_phoneme_feedback_t fb;
+        assert(olineri_result_get_phoneme_feedback(result, 4, &fb) == OLINERI_OK);
         assert(std::string(fb.expected_phoneme) == "/l/");
-        assert(fb.status == VAANI_PHONEME_CORRECT);
+        assert(fb.status == OLINERI_PHONEME_CORRECT);
 
-        vaani_result_destroy(result);
-        vaani_session_destroy(hi_session);
+        olineri_result_destroy(result);
+        olineri_session_destroy(hi_session);
     }
 
     // 3. Telugu Assessment Session: "అమ్మ"
     {
-        vaani_session_handle_t te_session = nullptr;
-        assert(vaani_session_create(runtime, "te-IN", &te_session) == VAANI_OK);
+        olineri_session_handle_t te_session = nullptr;
+        assert(olineri_session_create(runtime, "te-IN", &te_session) == OLINERI_OK);
 
-        vaani_result_handle_t result = nullptr;
-        assert(vaani_assess_pronunciation(te_session, "అమ్మ", audio.data(), audio.size(), 16000, &result) == VAANI_OK);
+        olineri_result_handle_t result = nullptr;
+        assert(olineri_assess_pronunciation(te_session, "అమ్మ", audio.data(), audio.size(), 16000, &result) == OLINERI_OK);
         assert(result != nullptr);
-        assert(vaani_result_get_phoneme_count(result) == 4); // /ɐ/, /m/, /m/, /ɐ/
-        assert(vaani_result_get_overall_score(result) >= 70.0f);
+        assert(olineri_result_get_phoneme_count(result) == 4); // /ɐ/, /m/, /m/, /ɐ/
+        assert(olineri_result_get_overall_score(result) >= 70.0f);
 
-        vaani_phoneme_feedback_t fb;
-        assert(vaani_result_get_phoneme_feedback(result, 1, &fb) == VAANI_OK);
+        olineri_phoneme_feedback_t fb;
+        assert(olineri_result_get_phoneme_feedback(result, 1, &fb) == OLINERI_OK);
         assert(std::string(fb.expected_phoneme) == "/m/");
-        assert(fb.status == VAANI_PHONEME_CORRECT);
+        assert(fb.status == OLINERI_PHONEME_CORRECT);
 
-        vaani_result_destroy(result);
-        vaani_session_destroy(te_session);
+        olineri_result_destroy(result);
+        olineri_session_destroy(te_session);
     }
 
-    vaani_runtime_destroy(runtime);
-    vaani::fs::remove_all(TEST_SANDBOX);
+    olineri_runtime_destroy(runtime);
+    olineri::fs::remove_all(TEST_SANDBOX);
     std::cout << "[PASS] Sanskrit, Hindi, and Telugu assessment sessions via C ABI" << std::endl;
 }
 
 int main() {
-    std::cout << "=== Running Vaani Multi-Language Expansion Suite (sa, hi, te) ===" << std::endl;
+    std::cout << "=== Running Olineri Multi-Language Expansion Suite (sa, hi, te) ===" << std::endl;
     test_sanskrit_g2p();
     test_hindi_g2p();
     test_telugu_g2p();

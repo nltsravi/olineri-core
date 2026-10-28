@@ -1,4 +1,0 @@
-module CVaani [system] {
-    header "vaani_c_api.h"
-    export *
-}

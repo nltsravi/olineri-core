@@ -1,5 +1,5 @@
 import Foundation
-import CVaani
+import COlineri
 
 /// Classification of a detected pronunciation segment.
 public enum PhonemeStatus: Int, Sendable {
@@ -38,7 +38,7 @@ public struct PhonemeFeedback: Sendable {
 }
 
 /// Comprehensive offline pronunciation assessment result.
-public struct VaaniAssessmentResult: Sendable {
+public struct OlineriAssessmentResult: Sendable {
     public let overallScore: Float
     public let phonemes: [PhonemeFeedback]
 
@@ -49,7 +49,7 @@ public struct VaaniAssessmentResult: Sendable {
 }
 
 /// Typed Swift errors produced by the native speech engine.
-public enum VaaniError: Error, LocalizedError {
+public enum OlineriError: Error, LocalizedError {
     case initializationFailed(String)
     case packageNotFound(String)
     case invalidPackage(String)
@@ -68,18 +68,18 @@ public enum VaaniError: Error, LocalizedError {
 }
 
 /// Thread-safe language inference session.
-public final class VaaniSession: @unchecked Sendable {
-    private var handle: vaani_session_handle_t?
+public final class OlineriSession: @unchecked Sendable {
+    private var handle: olineri_session_handle_t?
     public let language: String
 
-    internal init(handle: vaani_session_handle_t, language: String) {
+    internal init(handle: olineri_session_handle_t, language: String) {
         self.handle = handle
         self.language = language
     }
 
     deinit {
         if let handle = handle {
-            vaani_session_destroy(handle)
+            olineri_session_destroy(handle)
         }
     }
 
@@ -88,14 +88,14 @@ public final class VaaniSession: @unchecked Sendable {
     ///   - text: Expected Brahmic script text (e.g. "பழம்", "नमः", "कमल", "అమ్మ").
     ///   - audioSamples: Array of single-channel float PCM samples normalized to [-1.0, 1.0].
     ///   - sampleRate: Audio sample rate in Hz (default 16000).
-    public func assess(text: String, audioSamples: [Float], sampleRate: UInt32 = 16000) throws -> VaaniAssessmentResult {
+    public func assess(text: String, audioSamples: [Float], sampleRate: UInt32 = 16000) throws -> OlineriAssessmentResult {
         guard let handle = handle else {
-            throw VaaniError.assessmentFailed("Session is closed.")
+            throw OlineriError.assessmentFailed("Session is closed.")
         }
 
-        var resultHandle: vaani_result_handle_t?
+        var resultHandle: olineri_result_handle_t?
         let status = audioSamples.withUnsafeBufferPointer { buffer in
-            vaani_assess_pronunciation(
+            olineri_assess_pronunciation(
                 handle,
                 text,
                 buffer.baseAddress,
@@ -105,21 +105,21 @@ public final class VaaniSession: @unchecked Sendable {
             )
         }
 
-        guard status == VAANI_OK, let res = resultHandle else {
-            throw VaaniError.assessmentFailed("Engine returned status code: \(status.rawValue)")
+        guard status == OLINERI_OK, let res = resultHandle else {
+            throw OlineriError.assessmentFailed("Engine returned status code: \(status.rawValue)")
         }
 
-        defer { vaani_result_destroy(res) }
+        defer { olineri_result_destroy(res) }
 
-        let overallScore = vaani_result_get_overall_score(res)
-        let phonemeCount = vaani_result_get_phoneme_count(res)
+        let overallScore = olineri_result_get_overall_score(res)
+        let phonemeCount = olineri_result_get_phoneme_count(res)
 
         var feedbacks: [PhonemeFeedback] = []
         feedbacks.reserveCapacity(Int(phonemeCount))
 
         for i in 0..<phonemeCount {
-            var fb = vaani_phoneme_feedback_t()
-            if vaani_result_get_phoneme_feedback(res, i, &fb) == VAANI_OK {
+            var fb = olineri_phoneme_feedback_t()
+            if olineri_result_get_phoneme_feedback(res, i, &fb) == OLINERI_OK {
                 let exp = String(cString: &fb.expected_phoneme.0)
                 let status = PhonemeStatus(rawValue: Int(fb.status.rawValue)) ?? .uncertain
                 feedbacks.append(PhonemeFeedback(
@@ -132,41 +132,41 @@ public final class VaaniSession: @unchecked Sendable {
             }
         }
 
-        return VaaniAssessmentResult(overallScore: overallScore, phonemes: feedbacks)
+        return OlineriAssessmentResult(overallScore: overallScore, phonemes: feedbacks)
     }
 }
 
 /// Master runtime managing offline packages and inference models.
-public final class VaaniRuntime: @unchecked Sendable {
-    private var handle: vaani_runtime_handle_t?
+public final class OlineriRuntime: @unchecked Sendable {
+    private var handle: olineri_runtime_handle_t?
     public let storageDirectory: String
 
     public init(storageDirectory: String) throws {
         self.storageDirectory = storageDirectory
-        var h: vaani_runtime_handle_t?
-        let status = vaani_runtime_create(storageDirectory, &h)
-        guard status == VAANI_OK, let validHandle = h else {
-            throw VaaniError.initializationFailed("Native code \(status.rawValue)")
+        var h: olineri_runtime_handle_t?
+        let status = olineri_runtime_create(storageDirectory, &h)
+        guard status == OLINERI_OK, let validHandle = h else {
+            throw OlineriError.initializationFailed("Native code \(status.rawValue)")
         }
         self.handle = validHandle
     }
 
     deinit {
         if let handle = handle {
-            vaani_runtime_destroy(handle)
+            olineri_runtime_destroy(handle)
         }
     }
 
     /// Installs a verified language package from a local directory.
     public func installPackage(from directoryPath: String) throws -> String {
         guard let handle = handle else {
-            throw VaaniError.initializationFailed("Runtime is closed.")
+            throw OlineriError.initializationFailed("Runtime is closed.")
         }
 
         var outId = [CChar](repeating: 0, count: 64)
-        let status = vaani_package_install(handle, directoryPath, &outId, 64)
-        guard status == VAANI_OK else {
-            throw VaaniError.invalidPackage("Failed with code \(status.rawValue)")
+        let status = olineri_package_install(handle, directoryPath, &outId, 64)
+        guard status == OLINERI_OK else {
+            throw OlineriError.invalidPackage("Failed with code \(status.rawValue)")
         }
         return String(cString: outId)
     }
@@ -174,25 +174,25 @@ public final class VaaniRuntime: @unchecked Sendable {
     /// Uninstalls an existing language package.
     public func uninstallPackage(packageId: String) throws {
         guard let handle = handle else {
-            throw VaaniError.initializationFailed("Runtime is closed.")
+            throw OlineriError.initializationFailed("Runtime is closed.")
         }
-        let status = vaani_package_uninstall(handle, packageId)
-        guard status == VAANI_OK else {
-            throw VaaniError.packageNotFound(packageId)
+        let status = olineri_package_uninstall(handle, packageId)
+        guard status == OLINERI_OK else {
+            throw OlineriError.packageNotFound(packageId)
         }
     }
 
     /// Creates an active inference session for the given language.
-    public func createSession(language: String) throws -> VaaniSession {
+    public func createSession(language: String) throws -> OlineriSession {
         guard let handle = handle else {
-            throw VaaniError.initializationFailed("Runtime is closed.")
+            throw OlineriError.initializationFailed("Runtime is closed.")
         }
 
-        var sessionHandle: vaani_session_handle_t?
-        let status = vaani_session_create(handle, language, &sessionHandle)
-        guard status == VAANI_OK, let s = sessionHandle else {
-            throw VaaniError.sessionCreationFailed(language)
+        var sessionHandle: olineri_session_handle_t?
+        let status = olineri_session_create(handle, language, &sessionHandle)
+        guard status == OLINERI_OK, let s = sessionHandle else {
+            throw OlineriError.sessionCreationFailed(language)
         }
-        return VaaniSession(handle: s, language: language)
+        return OlineriSession(handle: s, language: language)
     }
 }

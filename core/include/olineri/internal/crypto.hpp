@@ -1,12 +1,12 @@
-#ifndef VAANI_INTERNAL_CRYPTO_HPP
-#define VAANI_INTERNAL_CRYPTO_HPP
+#ifndef OLINERI_INTERNAL_CRYPTO_HPP
+#define OLINERI_INTERNAL_CRYPTO_HPP
 
 #include <string>
 #include <vector>
 #include <cstdint>
 #include <cstddef>
 
-namespace vaani {
+namespace olineri {
 namespace crypto {
 
 /**
@@ -38,19 +38,19 @@ bool hex_to_bytes(const std::string& hex, std::vector<uint8_t>& out_bytes);
 std::string bytes_to_hex(const uint8_t* data, size_t length);
 
 /**
- * @brief Verifies an Ed25519 detached signature.
- * @param message_bytes The raw message content.
- * @param signature_bytes The 64-byte signature.
- * @param public_key_bytes The 32-byte public key.
- * @return true if signature is mathematically valid, false otherwise.
+ * @brief Verifies an Ed25519 digital signature against a public key.
+ * @param message Data that was signed.
+ * @param signature 64-byte raw signature.
+ * @param public_key 32-byte raw Ed25519 public key.
+ * @return true if valid, false otherwise.
  */
 bool ed25519_verify(
-    const std::vector<uint8_t>& message_bytes,
-    const std::vector<uint8_t>& signature_bytes,
-    const std::vector<uint8_t>& public_key_bytes
+    const std::vector<uint8_t>& message,
+    const std::vector<uint8_t>& signature,
+    const std::vector<uint8_t>& public_key
 );
 
 } // namespace crypto
-} // namespace vaani
+} // namespace olineri
 
-#endif // VAANI_INTERNAL_CRYPTO_HPP
+#endif // OLINERI_INTERNAL_CRYPTO_HPP

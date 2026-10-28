@@ -1,10 +1,10 @@
-#include "vaani/internal/manifest.hpp"
-#include "vaani/internal/json.hpp"
-#include "vaani/internal/filesystem.hpp"
+#include "olineri/internal/manifest.hpp"
+#include "olineri/internal/json.hpp"
+#include "olineri/internal/filesystem.hpp"
 #include <sstream>
 #include <vector>
 
-namespace vaani {
+namespace olineri {
 namespace manifest {
 
 namespace {
@@ -37,10 +37,10 @@ bool is_version_compatible(const std::string& required, const std::string& curre
     return true; // Exactly equal
 }
 
-vaani_status_t parse_manifest(const std::string& json_text, PackageManifest& out) {
+olineri_status_t parse_manifest(const std::string& json_text, PackageManifest& out) {
     auto root = json::parse(json_text);
     if (!root.is_object()) {
-        return VAANI_ERR_PACKAGE_CORRUPTED;
+        return OLINERI_ERR_PACKAGE_CORRUPTED;
     }
 
     out.schema_version = root["schemaVersion"].as_string();
@@ -105,42 +105,42 @@ vaani_status_t parse_manifest(const std::string& json_text, PackageManifest& out
         }
     }
 
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
-vaani_status_t validate_manifest(const PackageManifest& manifest, const std::string& current_sdk_version) {
+olineri_status_t validate_manifest(const PackageManifest& manifest, const std::string& current_sdk_version) {
     if (manifest.package_id.empty() || manifest.language_tag.empty() || manifest.version.empty()) {
-        return VAANI_ERR_PACKAGE_CORRUPTED;
+        return OLINERI_ERR_PACKAGE_CORRUPTED;
     }
 
     // Check schema version (must be 1.x)
     if (manifest.schema_version.rfind("1.", 0) != 0 && manifest.schema_version != "1.0.0") {
-        return VAANI_ERR_INCOMPATIBLE_VERSION;
+        return OLINERI_ERR_INCOMPATIBLE_VERSION;
     }
 
     // Check minimum SDK version compatibility
     if (!manifest.min_sdk_version.empty()) {
         if (!is_version_compatible(manifest.min_sdk_version, current_sdk_version)) {
-            return VAANI_ERR_INCOMPATIBLE_VERSION;
+            return OLINERI_ERR_INCOMPATIBLE_VERSION;
         }
     }
 
     // Artifacts must exist and paths must be strictly safe relative paths
     if (manifest.artifacts.empty()) {
-        return VAANI_ERR_PACKAGE_CORRUPTED;
+        return OLINERI_ERR_PACKAGE_CORRUPTED;
     }
 
     for (const auto& art : manifest.artifacts) {
         if (art.path.empty() || !fs::is_safe_relative_path(art.path)) {
-            return VAANI_ERR_PATH_TRAVERSAL;
+            return OLINERI_ERR_PATH_TRAVERSAL;
         }
         if (art.sha256.length() != 64) {
-            return VAANI_ERR_PACKAGE_CORRUPTED;
+            return OLINERI_ERR_PACKAGE_CORRUPTED;
         }
     }
 
-    return VAANI_OK;
+    return OLINERI_OK;
 }
 
 } // namespace manifest
-} // namespace vaani
+} // namespace olineri
